@@ -1,0 +1,1721 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kamran Akhtar — Multimedia Journalist (@kamran_reports)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400;1,6..72,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        serif: ['Newsreader', 'Georgia', 'serif'],
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        paper: '#FAF8F3',
+                        paperAlt: '#F2EFE7',
+                        ink: '#141413',
+                        inkMuted: '#4A4945',
+                        inkLight: '#73716A',
+                        rule: '#DCD6C8',
+                        accent: '#9E2A2B',
+                        accentLight: '#F7ECEA',
+                        darkroom: '#0F0F0E',
+                        darkroomCard: '#171715',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #FAF8F3;
+            color: #141413;
+            font-feature-settings: "kern" 1, "liga" 1;
+        }
+        .double-rule {
+            border-top: 2px solid #141413;
+            border-bottom: 1px solid #141413;
+            height: 5px;
+        }
+        /* Darkroom Film Frame Styling */
+        .photo-frame {
+            position: relative;
+            overflow: hidden;
+            background-color: #0F0F0E;
+        }
+        .photo-frame::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            background-image: radial-gradient(rgba(255,255,255,0.04) 1px, transparent 0);
+            background-size: 3px 3px;
+            box-shadow: inset 0 0 42px rgba(0, 0, 0, 0.45);
+        }
+        /* Subtle Documentary Ken Burns Motion */
+        @keyframes kenBurnsSlow {
+            0% {
+                transform: scale(1) translate3d(0, 0, 0);
+            }
+            50% {
+                transform: scale(1.055) translate3d(-1%, -0.8%, 0);
+            }
+            100% {
+                transform: scale(1) translate3d(0, 0, 0);
+            }
+        }
+        @keyframes kenBurnsAlt {
+            0% {
+                transform: scale(1.04) translate3d(0.8%, 0.5%, 0);
+            }
+            50% {
+                transform: scale(1) translate3d(-0.6%, -0.5%, 0);
+            }
+            100% {
+                transform: scale(1.04) translate3d(0.8%, 0.5%, 0);
+            }
+        }
+        .ken-burns-lead {
+            animation: kenBurnsSlow 22s ease-in-out infinite;
+            will-change: transform;
+        }
+        .ken-burns-card {
+            animation: kenBurnsSlow 26s ease-in-out infinite;
+            will-change: transform;
+        }
+        .ken-burns-card-alt {
+            animation: kenBurnsAlt 28s ease-in-out infinite;
+            will-change: transform;
+        }
+        .photo-frame img {
+            transition: transform 0.65s cubic-bezier(0.16, 1, 0.3, 1), filter 0.45s ease, opacity 0.9s ease-in-out;
+            filter: contrast(1.05);
+        }
+        .group:hover .photo-frame img,
+        .photo-frame:hover img {
+            animation-play-state: paused;
+            filter: contrast(1.08);
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 7px;
+            height: 7px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #F2EFE7;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #C5BEB0;
+            border-radius: 4px;
+        }
+        /* Print & PDF Export Mode */
+        @media print {
+            @page {
+                size: A4 portrait;
+                margin: 12mm 14mm;
+            }
+            body {
+                background-color: #FFFFFF !important;
+                color: #000000 !important;
+                font-size: 10.5pt !important;
+            }
+            .no-print, #mobile-header, #left-rail, #toast, #case-modal, #pitch-drawer, #veritas-modal {
+                display: none !important;
+            }
+            #main-stage {
+                margin-left: 0 !important;
+                max-width: 100% !important;
+                padding: 0 !important;
+            }
+            .print-break-inside {
+                break-inside: avoid;
+                page-break-inside: avoid;
+            }
+            .photo-frame {
+                background-color: #111111 !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            .ken-burns-lead, .ken-burns-card, .ken-burns-card-alt {
+                animation: none !important;
+                transform: none !important;
+            }
+            a[href^="http"]::after {
+                content: " (" attr(href) ")";
+                font-family: 'JetBrains Mono', monospace;
+                font-size: 7.5pt;
+                color: #4A4945;
+            }
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-accent selection:text-white">
+
+    <!-- Hidden File Input for Optional Local Photo Replacement -->
+    <input type="file" id="local-photo-input" accept="image/*" class="hidden" onchange="handleLocalPhotoSelected(event)">
+    <!-- Hidden Multi-File Input for Batch Loading Uploaded Photos -->
+    <input type="file" id="batch-photo-input" accept="image/*" multiple class="hidden" onchange="handleBatchPhotosSelected(event)">
+
+    <!-- MOBILE / TABLET TOP BAR (Visible below lg) -->
+    <header id="mobile-header" class="no-print lg:hidden sticky top-0 z-40 bg-paper/95 backdrop-blur-md border-b border-rule">
+        <div class="px-4 h-14 flex items-center justify-between">
+            <div>
+                <a href="#hero" class="font-serif font-bold text-lg tracking-tight text-ink block leading-none">KAMRAN AKHTAR</a>
+                <span class="font-mono text-[10px] text-inkMuted uppercase tracking-wider">Multimedia Journalist • @kamran_reports</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <button onclick="openVeritasModal()" class="px-2.5 py-1.5 rounded border border-accent/40 bg-accentLight text-accent font-mono text-[11px] font-semibold cursor-pointer">
+                    VERITAS
+                </button>
+                <button onclick="triggerFinalPrint()" class="px-2.5 py-1.5 rounded border border-ink bg-paperAlt text-ink font-mono text-[11px] font-semibold cursor-pointer">
+                    PDF
+                </button>
+                <button onclick="openPitchDrawer()" class="px-2.5 py-1.5 rounded bg-ink text-paper font-mono text-[11px] font-semibold cursor-pointer">
+                    Pitch
+                </button>
+            </div>
+        </div>
+        <!-- Mobile Jump Strip -->
+        <div class="border-t border-rule/70 bg-paperAlt px-4 py-2 overflow-x-auto flex items-center gap-3 font-mono text-[11px] whitespace-nowrap">
+            <a href="#hero" class="text-accent font-semibold">01. Lead</a>
+            <a href="#meenapur" class="text-inkMuted hover:text-ink">02. Meenapur</a>
+            <a href="#jewstreet" class="text-inkMuted hover:text-ink">03. Jew Street</a>
+            <a href="#delhi" class="text-inkMuted hover:text-ink">04. Delhi Night</a>
+            <a href="#sewage" class="text-inkMuted hover:text-ink">05. Sewage</a>
+            <a href="#energy" class="text-inkMuted hover:text-ink">06. Energy</a>
+            <a href="#kashmir" class="text-inkMuted hover:text-ink">07. Kashmir</a>
+            <a href="#rubber" class="text-inkMuted hover:text-ink">08. Rubber</a>
+            <a href="#archive-layer" class="text-ink font-semibold">Photo Archive ↗</a>
+            <a href="#published" class="text-ink font-semibold">Clips</a>
+            <a href="#build-log" class="text-inkMuted">Build Log</a>
+        </div>
+    </header>
+
+    <!-- DIGITAL PORTFOLIO SHELL: STICKY LEFT RAIL + IMMERSIVE MAIN STAGE -->
+    <div class="min-h-screen flex flex-col lg:flex-row">
+
+        <!-- LEFT EDITORIAL NAVIGATION RAIL (Desktop Sticky) -->
+        <aside id="left-rail" class="no-print hidden lg:flex lg:w-80 xl:w-[340px] lg:fixed lg:inset-y-0 lg:left-0 bg-paperAlt border-r border-rule flex-col justify-between p-6 xl:p-7 overflow-y-auto z-30">
+            <div class="space-y-6">
+                <!-- Masthead Identity -->
+                <div class="space-y-2.5 pb-5 border-b border-rule">
+                    <div class="flex items-center justify-between gap-2">
+                        <span class="px-2 py-0.5 rounded bg-ink text-paper font-mono text-[10px] uppercase tracking-widest font-semibold">
+                            Digital Portfolio
+                        </span>
+                        <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-amber-100 text-amber-950 border border-amber-300 font-mono text-[10px] font-semibold">
+                            <span class="w-1.5 h-1.5 rounded-full bg-amber-600 animate-pulse"></span>
+                            WIP // LIVE
+                        </span>
+                    </div>
+                    <h1 class="font-serif text-3xl font-bold tracking-tight text-ink leading-none pt-1">
+                        Kamran Akhtar
+                    </h1>
+                    <p class="font-mono text-xs uppercase tracking-wider text-accent font-semibold">
+                        Multimedia Journalist
+                    </p>
+                    <p class="font-serif italic text-sm text-inkMuted leading-relaxed">
+                        “Reporting from the fault lines of power, infrastructure, technology, labour, ecology, and public life.”
+                    </p>
+                </div>
+
+                <!-- Story Index Navigation -->
+                <nav aria-label="Portfolio Sections" class="space-y-1.5">
+                    <div class="font-mono text-[10px] uppercase tracking-widest text-inkLight pb-1">
+                        Visual Dispatches &amp; Chapters
+                    </div>
+                    <a href="#hero" class="flex items-center justify-between px-2.5 py-1.5 rounded hover:bg-paper text-xs font-mono text-ink font-semibold transition-colors group">
+                        <span>01. Invisible on the Avenue</span>
+                        <span class="text-[10px] text-accent">LEAD</span>
+                    </a>
+                    <a href="#meenapur" class="flex items-center justify-between px-2.5 py-1.5 rounded hover:bg-paper text-xs font-mono text-inkMuted hover:text-ink transition-colors">
+                        <span>02. Meenapur (2 Frames)</span>
+                        <span class="text-[10px] text-inkLight">FIELD</span>
+                    </a>
+                    <a href="#jewstreet" class="flex items-center justify-between px-2.5 py-1.5 rounded hover:bg-paper text-xs font-mono text-inkMuted hover:text-ink transition-colors">
+                        <span>03. Jew Street, Fort Kochi</span>
+                        <span class="text-[10px] text-inkLight">ESSAY</span>
+                    </a>
+                    <a href="#delhi" class="flex items-center justify-between px-2.5 py-1.5 rounded hover:bg-paper text-xs font-mono text-inkMuted hover:text-ink transition-colors">
+                        <span>04. Delhi After Dark</span>
+                        <span class="text-[10px] text-inkLight">NCR</span>
+                    </a>
+                    <a href="#sewage" class="flex items-center justify-between px-2.5 py-1.5 rounded hover:bg-paper text-xs font-mono text-inkMuted hover:text-ink transition-colors">
+                        <span>05. Manual Sewage</span>
+                        <span class="text-[10px] text-inkLight">CIVIC</span>
+                    </a>
+                    <a href="#energy" class="flex items-center justify-between px-2.5 py-1.5 rounded hover:bg-paper text-xs font-mono text-inkMuted hover:text-ink transition-colors">
+                        <span>06. Energy &amp; West Asia</span>
+                        <span class="text-[10px] text-inkLight">SUPPLY</span>
+                    </a>
+                    <a href="#kashmir" class="flex items-center justify-between px-2.5 py-1.5 rounded hover:bg-paper text-xs font-mono text-inkMuted hover:text-ink transition-colors">
+                        <span>07. Kashmir Ecology (2)</span>
+                        <span class="text-[10px] text-inkLight">CLIMATE</span>
+                    </a>
+                    <a href="#rubber" class="flex items-center justify-between px-2.5 py-1.5 rounded hover:bg-paper text-xs font-mono text-inkMuted hover:text-ink transition-colors">
+                        <span>08. Rubber Farmers</span>
+                        <span class="text-[10px] text-inkLight">FILM</span>
+                    </a>
+
+                    <div class="pt-3 mt-2 border-t border-rule/80 font-mono text-[10px] uppercase tracking-widest text-inkLight pb-1">
+                        Archive, Clips &amp; Methodology
+                    </div>
+                    <a href="#archive-layer" class="flex items-center justify-between px-2.5 py-1.5 rounded bg-paper border border-rule hover:border-ink text-xs font-mono text-ink font-semibold transition-colors">
+                        <span>Hosted Photo Edition</span>
+                        <span class="text-accent">LAYER ↗</span>
+                    </a>
+                    <a href="#published" class="flex items-center justify-between px-2.5 py-1.5 rounded hover:bg-paper text-xs font-mono text-inkMuted hover:text-ink transition-colors">
+                        <span>Published Clips &amp; Bylines</span>
+                        <span class="text-[10px] text-inkLight">INDEX</span>
+                    </a>
+                    <a href="#experience" class="flex items-center justify-between px-2.5 py-1.5 rounded hover:bg-paper text-xs font-mono text-inkMuted hover:text-ink transition-colors">
+                        <span>Fellowships &amp; Toolkit</span>
+                        <span class="text-[10px] text-inkLight">CV</span>
+                    </a>
+                    <a href="#build-log" class="flex items-center justify-between px-2.5 py-1.5 rounded hover:bg-paper text-xs font-mono text-inkMuted hover:text-ink transition-colors">
+                        <span>Engineering &amp; Build Log</span>
+                        <span class="text-[10px] text-amber-700">WIP</span>
+                    </a>
+                </nav>
+            </div>
+
+            <!-- Bottom Desk Coordinates & Primary Actions -->
+            <div class="pt-5 mt-6 border-t border-rule space-y-3">
+                <div class="space-y-1 font-mono text-[11px] text-inkMuted">
+                    <div class="flex items-center justify-between">
+                        <span>DESK:</span>
+                        <span class="text-ink font-medium">Jamia Nagar, New Delhi</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span>HANDLE:</span>
+                        <button onclick="copyToClipboard('@kamran_reports', 'Handle copied: @kamran_reports')" class="text-ink font-semibold hover:text-accent cursor-pointer">
+                            @kamran_reports
+                        </button>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span>EMAIL:</span>
+                        <button onclick="copyToClipboard('hi.kamran.akhtar@gmail.com', 'Email copied')" class="text-ink font-medium hover:text-accent truncate max-w-[180px] cursor-pointer">
+                            hi.kamran.akhtar@gmail.com
+                        </button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 gap-2 pt-1">
+                    <button onclick="openVeritasModal()" class="w-full py-2 px-3 rounded border border-accent bg-accentLight hover:bg-accent hover:text-white text-accent font-mono text-xs font-semibold transition-colors cursor-pointer text-center">
+                        VERITAS v1.0 Protocol (Live) →
+                    </button>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button onclick="openPitchDrawer()" class="py-2 px-2.5 rounded bg-ink text-paper hover:bg-accent font-mono text-[11px] font-semibold transition-colors cursor-pointer">
+                            Pitch / Contact
+                        </button>
+                        <button onclick="triggerFinalPrint()" class="py-2 px-2.5 rounded border border-ink bg-paper hover:bg-ink hover:text-paper text-ink font-mono text-[11px] font-semibold transition-colors cursor-pointer">
+                            Save PDF
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- MAIN IMMERSIVE DIGITAL PORTFOLIO STAGE -->
+        <main id="main-stage" class="flex-1 lg:ml-80 xl:ml-[340px] max-w-5xl mx-auto px-4 sm:px-8 lg:px-10 py-5 sm:py-6">
+
+            <!-- 1. DIGITAL FRONT-PAGE HERO & DARKROOM LEAD DISPATCH (#hero) -->
+            <section id="hero" class="mb-12 scroll-mt-20">
+                <!-- Broadsheet Masthead & Credential Strip -->
+                <div class="pb-3 mb-4 border-b-2 border-ink">
+                    <div class="flex flex-wrap items-center justify-between gap-2 pb-2 mb-2 border-b border-rule font-mono text-[11px] text-inkMuted">
+                        <div class="flex flex-wrap items-center gap-2">
+                            <span class="px-2 py-0.5 rounded bg-ink text-paper font-semibold uppercase">DSJ &amp; IIMC Trained</span>
+                            <span>•</span>
+                            <span>Sub Editor at Web Desk, <strong class="text-ink">Business Standard</strong></span>
+                            <span>•</span>
+                            <a href="https://erai.knowledgenetworks.org/fellow/kamran-akhtar/" target="_blank" rel="noopener noreferrer" class="text-accent font-semibold hover:underline">
+                                ERAI AI Journalism Fellow ↗
+                            </a>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-amber-100 text-amber-950 border border-amber-300 font-semibold text-[10px]">
+                                <span class="w-1.5 h-1.5 rounded-full bg-amber-600 animate-pulse"></span>
+                                WIP // LIVING EDITION
+                            </span>
+                            <a href="https://publicnewsx.com/author/kamranakhtar/" target="_blank" rel="noopener noreferrer" class="text-ink font-semibold hover:text-accent underline decoration-rule underline-offset-2">
+                                Public News X Bylines ↗
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-2">
+                        <div>
+                            <div class="font-mono text-[10px] uppercase tracking-widest text-inkLight">
+                                Investigative, Visual &amp; Computational Journalism • New Delhi
+                            </div>
+                            <h2 class="font-serif text-2xl sm:text-3xl font-bold tracking-tight text-ink leading-none mt-0.5">
+                                Kamran Akhtar <span class="font-mono text-xs sm:text-sm font-normal text-inkMuted align-middle ml-1">@kamran_reports</span>
+                            </h2>
+                        </div>
+                        <div class="no-print flex flex-wrap items-center gap-2 font-mono text-[11px]">
+                            <button type="button" onclick="document.getElementById('batch-photo-input').click()" class="px-3 py-1 rounded bg-ink hover:bg-accent text-paper font-semibold transition-colors cursor-pointer">
+                                + Load Your 3 Photos in Preview
+                            </button>
+                            <button type="button" onclick="openVeritasModal()" class="px-3 py-1 rounded border border-accent bg-accentLight hover:bg-accent hover:text-white text-accent font-semibold transition-colors cursor-pointer">
+                                VERITAS v1.0 Protocol
+                            </button>
+                            <a href="#archive-layer" class="px-3 py-1 rounded border border-rule bg-paperAlt hover:border-ink text-ink font-semibold transition-colors">
+                                Hosted Photo Layer ↓
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- IMMERSIVE DARKROOM LEAD SHOWCASE (Above-the-Fold Split Stage) -->
+                <div class="rounded-xl bg-darkroom text-paper border border-ink overflow-hidden shadow-xl mb-6 print-break-inside">
+                    <!-- Top Darkroom Telemetry Bar -->
+                    <div class="px-4 sm:px-5 py-2.5 bg-darkroomCard border-b border-white/10 flex flex-wrap items-center justify-between gap-2 font-mono text-[10px] sm:text-[11px]">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-accent"></span>
+                            <span class="uppercase tracking-widest text-white font-semibold">Lead Photo Dispatch // Frame 01</span>
+                        </div>
+                        <div class="flex items-center gap-3 text-white/65">
+                            <span>OLD DELHI • 28.6507° N, 77.2334° E</span>
+                        </div>
+                    </div>
+
+                    <!-- Side-by-Side Lead Photo + Editorial Dossier -->
+                    <div class="grid grid-cols-1 lg:grid-cols-12">
+                        <div class="lg:col-span-7 group relative photo-frame aspect-[4/3] lg:aspect-auto lg:min-h-[370px] w-full cursor-pointer border-b lg:border-b-0 lg:border-r border-white/10" onclick="openCaseModal('invisible-avenue')">
+                            <img id="img-lead-invisible-avenue" src="edited-image.jpg" data-fallbacks="images/edited-image.jpg,assets/edited-image.jpg" onerror="handleImageFallback(this, 'invisible-avenue', 'Invisible on the Avenue', 'Old Delhi • Matia Mahal / Jama Masjid Corridor')" alt="Invisible on the Avenue — Old Delhi street dispatch" class="w-full h-full object-cover ken-burns-lead">
+                            <button type="button" onclick="event.stopPropagation(); triggerPhotoUpload('invisible-avenue', 0)" class="no-print absolute bottom-3 right-3 z-10 px-3 py-1.5 rounded bg-black/85 hover:bg-accent text-white font-mono text-[10px] uppercase tracking-wider border border-white/25 transition-colors cursor-pointer">
+                                Load / Replace Photo
+                            </button>
+                        </div>
+
+                        <div class="lg:col-span-5 p-5 sm:p-6 bg-darkroomCard flex flex-col justify-between gap-4">
+                            <div class="space-y-2.5">
+                                <div class="font-mono text-[11px] text-red-400 uppercase tracking-wider font-semibold">
+                                    Photojournalism &amp; Urban Vulnerability
+                                </div>
+                                <h3 class="font-serif text-2xl sm:text-3xl font-bold text-white leading-tight">
+                                    Invisible on the Avenue
+                                </h3>
+                                <p class="font-serif italic text-sm sm:text-[15px] text-white/85 leading-relaxed border-l-2 border-accent pl-3.5">
+                                    “A barefoot child visibly consuming intoxicants walks a busy Delhi street outside Zahra and Al-Jawahar Restaurant. LPG cylinders are stacked on a cart behind him. The crowd moves around him as though he is not there.”
+                                </p>
+                            </div>
+
+                            <div class="space-y-3 pt-2 border-t border-white/10">
+                                <div class="p-3 rounded-lg bg-white/5 border border-white/10 space-y-2 font-mono text-xs">
+                                    <div class="text-[10px] uppercase tracking-widest text-white/50">Editorial Practice &amp; Beats</div>
+                                    <p class="text-white/85 leading-relaxed text-[11px]">
+                                        Field reporting, documentary filmmaking, RTI &amp; public-data auditing, web desk editing, and synthetic media verification.
+                                    </p>
+                                    <div class="flex flex-wrap gap-1.5 pt-0.5">
+                                        <span class="px-2 py-0.5 rounded bg-white/10 text-white/90 text-[10px]">Field Photo</span>
+                                        <span class="px-2 py-0.5 rounded bg-white/10 text-white/90 text-[10px]">Documentary</span>
+                                        <span class="px-2 py-0.5 rounded bg-white/10 text-white/90 text-[10px]">Data / RTI</span>
+                                        <span class="px-2 py-0.5 rounded bg-white/10 text-white/90 text-[10px]">AI Verification</span>
+                                    </div>
+                                </div>
+
+                                <div class="no-print flex items-center justify-between gap-2 font-mono text-[11px]">
+                                    <button type="button" onclick="openCaseModal('invisible-avenue')" class="px-3 py-1.5 rounded bg-accent hover:bg-red-800 text-white font-semibold transition-colors cursor-pointer">
+                                        Open Lead Field Notes →
+                                    </button>
+                                    <a href="#visual-archive" class="text-white/75 hover:text-white underline">
+                                        All 8 Dispatches ↓
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Interactive Visual Filter Bar -->
+                <div class="no-print flex flex-wrap items-center justify-between gap-3 py-3 px-4 rounded-lg bg-paperAlt border border-rule">
+                    <div class="flex items-center gap-2 font-mono text-xs">
+                        <span class="text-inkMuted uppercase font-semibold">Filter Dispatches:</span>
+                    </div>
+                    <div class="flex flex-wrap gap-1.5">
+                        <button onclick="filterStories('all')" data-filter="all" class="filter-btn px-3 py-1.5 rounded bg-ink text-paper font-mono text-xs font-semibold cursor-pointer transition-colors">
+                            All 8 Visual Stories
+                        </button>
+                        <button onclick="filterStories('photojournalism')" data-filter="photojournalism" class="filter-btn px-3 py-1.5 rounded bg-paper border border-rule text-inkMuted hover:text-ink font-mono text-xs cursor-pointer transition-colors">
+                            Photojournalism &amp; Field
+                        </button>
+                        <button onclick="filterStories('documentary-ecology')" data-filter="documentary-ecology" class="filter-btn px-3 py-1.5 rounded bg-paper border border-rule text-inkMuted hover:text-ink font-mono text-xs cursor-pointer transition-colors">
+                            Documentary, Energy &amp; Ecology
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 2. VISUAL FIELD STORIES & DOCUMENTARY FEATURES (Stories 02–08) -->
+            <section id="visual-archive" class="mb-16">
+                <div class="flex items-baseline justify-between border-b-2 border-ink pb-2.5 mb-8">
+                    <div>
+                        <span class="font-mono text-xs uppercase tracking-widest text-accent font-semibold">Field Reportage &amp; Documentary Plates</span>
+                        <h2 class="font-serif text-2xl sm:text-3xl font-bold text-ink">Visual Dispatches &amp; Ground Essays</h2>
+                    </div>
+                    <span class="font-mono text-xs text-inkMuted hidden sm:inline">Click any frame to open field notes</span>
+                </div>
+
+                <div id="stories-grid" class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Hydrated via JS -->
+                </div>
+            </section>
+
+            <!-- 3. DEDICATED SECTION: HOSTED PHOTOGRAPHIC EDITION (#archive-layer) -->
+            <section id="archive-layer" class="mb-16 scroll-mt-24 print-break-inside">
+                <div class="rounded-xl bg-darkroom text-paper border border-ink overflow-hidden shadow-lg">
+                    <div class="px-5 sm:px-7 py-4 bg-darkroomCard border-b border-white/10 flex flex-wrap items-center justify-between gap-3">
+                        <div>
+                            <span class="font-mono text-[11px] uppercase tracking-widest text-red-400 font-semibold">
+                                Companion Visual Layer • High-Resolution Raster Edition
+                            </span>
+                            <h2 class="font-serif text-2xl sm:text-3xl font-bold text-white mt-0.5">
+                                Hosted Photographic Edition — Visual Archive Layer
+                            </h2>
+                        </div>
+                        <a href="https://journalistkamran.github.io/portfolio/" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-accent hover:bg-red-800 text-white font-mono text-xs font-semibold transition-colors">
+                            <span>Launch Live Hosted Photo Edition</span>
+                            <span>↗</span>
+                        </a>
+                    </div>
+
+                    <div class="p-5 sm:p-7 grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+                        <!-- Interactive Contact-Sheet Preview Selector -->
+                        <div class="lg:col-span-7 space-y-3">
+                            <div class="rounded-lg border border-white/15 bg-black overflow-hidden">
+                                <div class="px-3.5 py-2 bg-white/5 border-b border-white/10 flex items-center justify-between font-mono text-[10px] text-white/70">
+                                    <span id="archive-preview-label">PLATE PREVIEW 01 // OLD DELHI STREET</span>
+                                    <span>journalistkamran.github.io/portfolio</span>
+                                </div>
+                                <div class="aspect-[16/10] w-full overflow-hidden">
+                                    <img id="archive-preview-img" src="edited-image.jpg" data-fallbacks="images/edited-image.jpg,assets/edited-image.jpg" onerror="handleImageFallback(this, 'invisible-avenue', 'Invisible on the Avenue', 'Hosted High-Resolution Visual Layer • GitHub Pages')" alt="Hosted Photographic Edition Preview" class="w-full h-full object-cover">
+                                </div>
+                            </div>
+
+                            <!-- Interactive Thumbnail Switcher -->
+                            <div class="no-print grid grid-cols-4 gap-2">
+                                <button type="button" onclick="switchArchivePlate('invisible-avenue', 'PLATE PREVIEW 01 // OLD DELHI STREET')" class="archive-thumb-btn p-1 rounded border border-accent bg-white/10 font-mono text-[10px] text-white text-center cursor-pointer truncate">
+                                    01. Old Delhi
+                                </button>
+                                <button type="button" onclick="switchArchivePlate('meenapur-1', 'PLATE PREVIEW 02 // MEENAPUR, BIHAR')" class="archive-thumb-btn p-1 rounded border border-white/15 bg-white/5 hover:border-white/40 font-mono text-[10px] text-white/80 text-center cursor-pointer truncate">
+                                    02. Meenapur
+                                </button>
+                                <button type="button" onclick="switchArchivePlate('jew-street-1', 'PLATE PREVIEW 03 // JEW STREET, KOCHI')" class="archive-thumb-btn p-1 rounded border border-white/15 bg-white/5 hover:border-white/40 font-mono text-[10px] text-white/80 text-center cursor-pointer truncate">
+                                    03. Fort Kochi
+                                </button>
+                                <button type="button" onclick="switchArchivePlate('kashmir-1', 'PLATE PREVIEW 04 // KASHMIR ECOLOGY')" class="archive-thumb-btn p-1 rounded border border-white/15 bg-white/5 hover:border-white/40 font-mono text-[10px] text-white/80 text-center cursor-pointer truncate">
+                                    04. Kashmir
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Description & Direct Archive Access -->
+                        <div class="lg:col-span-5 space-y-4">
+                            <p class="text-sm text-white/85 leading-relaxed">
+                                Alongside the self-contained broadsheet dispatches on this page, my original hosted photographic edition houses the full-resolution raster photography archive, full-bleed darkroom spreads, and visual field layouts across Old Delhi, Meenapur, Fort Kochi, Kashmir, and Delhi-NCR.
+                            </p>
+                            <div class="p-3.5 rounded-lg bg-white/5 border border-white/10 font-mono text-xs space-y-1.5">
+                                <div class="text-white/50 text-[10px] uppercase">Direct Archive Endpoint</div>
+                                <a href="https://journalistkamran.github.io/portfolio/" target="_blank" rel="noopener noreferrer" class="text-red-300 hover:text-white underline break-all block">
+                                    https://journalistkamran.github.io/portfolio/
+                                </a>
+                            </div>
+                            <div class="pt-1 flex flex-wrap gap-2.5">
+                                <a href="https://journalistkamran.github.io/portfolio/" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-4 py-2 rounded bg-white text-ink hover:bg-paperAlt font-mono text-xs font-semibold transition-colors">
+                                    <span>Open Full Visual Layer</span>
+                                    <span>↗</span>
+                                </a>
+                                <button type="button" onclick="openPitchDrawer()" class="no-print inline-flex items-center gap-1.5 px-3.5 py-2 rounded border border-white/25 text-white hover:border-white font-mono text-xs cursor-pointer">
+                                    Request High-Res Prints / Tearsheets
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 4. PUBLISHED CLIPS, EXTERNAL DISPATCHES & VERITAS PROTOCOL (#published) -->
+            <section id="published" class="mb-16 scroll-mt-24">
+                <div class="flex items-baseline justify-between border-b-2 border-ink pb-2.5 mb-6">
+                    <div>
+                        <span class="font-mono text-xs uppercase tracking-widest text-accent font-semibold">Published Reporting, Desk Bylines &amp; Methodology</span>
+                        <h2 class="font-serif text-2xl sm:text-3xl font-bold text-ink">Published Clips &amp; External Dispatches</h2>
+                    </div>
+                </div>
+
+                <div class="divide-y divide-rule border-t border-b border-rule bg-paper rounded-lg">
+                    <!-- Clip 1: Muslim Mirror — Delhi Blast before Bihar Polling -->
+                    <a href="https://muslimmirror.com/army-veterans-guided-al-falah-medicos-innocent-graduates-plead-dont-punish-us-for-the-hidden-crimes-of-a-few/" target="_blank" rel="noopener noreferrer" class="group flex flex-col sm:flex-row sm:items-center justify-between gap-3 py-5 px-4 hover:bg-paperAlt transition-colors print-break-inside">
+                        <div class="space-y-1.5 max-w-3xl">
+                            <div class="flex flex-wrap items-center gap-2 font-mono text-[11px]">
+                                <span class="px-2 py-0.5 rounded bg-accentLight text-accent font-semibold uppercase">Muslim Mirror</span>
+                                <span class="text-inkLight">•</span>
+                                <span class="text-inkMuted">Investigative &amp; Media Accountability Report</span>
+                            </div>
+                            <h3 class="font-serif text-lg sm:text-xl font-bold text-ink group-hover:text-accent transition-colors">
+                                Delhi Blast before Bihar Polling and other shades of the story
+                            </h3>
+                            <p class="text-xs sm:text-sm text-inkMuted leading-relaxed">
+                                Ground reporting examining the aftermath of the November 10, 2025 car blast near Delhi’s Red Fort—just one day before the November 12 Bihar assembly polling—following the arrests of doctors linked to Faridabad’s Al-Falah Medical College. Captures the voices of uninvolved medical graduates mentored by Indian Army veterans and interrogates media accountability amid viral misinformation.
+                            </p>
+                        </div>
+                        <span class="inline-flex items-center gap-1.5 font-mono text-xs font-semibold text-ink group-hover:text-accent shrink-0 self-start sm:self-center">
+                            Read Article ↗
+                        </span>
+                    </a>
+
+                    <!-- Clip 2: Muslim Mirror — Athar Hussain Custodial / Mob Assault Report -->
+                    <a href="https://muslimmirror.com/shocking-details-emerge-athar-hussain-died-a-week-after-brutal-assault-denied-timely-medical-care/" target="_blank" rel="noopener noreferrer" class="group flex flex-col sm:flex-row sm:items-center justify-between gap-3 py-5 px-4 hover:bg-paperAlt transition-colors print-break-inside">
+                        <div class="space-y-1.5 max-w-3xl">
+                            <div class="flex flex-wrap items-center gap-2 font-mono text-[11px]">
+                                <span class="px-2 py-0.5 rounded bg-accentLight text-accent font-semibold uppercase">Muslim Mirror</span>
+                                <span class="text-inkLight">•</span>
+                                <span class="text-inkMuted">Human Rights &amp; Criminal Justice Investigation</span>
+                            </div>
+                            <h3 class="font-serif text-lg sm:text-xl font-bold text-ink group-hover:text-accent transition-colors">
+                                Shocking Details Emerge: Athar Hussain Died a Week After Brutal Assault, Denied Timely Medical Care
+                            </h3>
+                            <p class="text-xs sm:text-sm text-inkMuted leading-relaxed">
+                                Reconstructs medical records, family testimonies, and institutional lapses surrounding the death of Athar Hussain following a brutal assault and delayed emergency medical intervention.
+                            </p>
+                        </div>
+                        <span class="inline-flex items-center gap-1.5 font-mono text-xs font-semibold text-ink group-hover:text-accent shrink-0 self-start sm:self-center">
+                            Read Article ↗
+                        </span>
+                    </a>
+
+                    <!-- Clip 3: Public News X Author Feed -->
+                    <a href="https://publicnewsx.com/author/kamranakhtar/" target="_blank" rel="noopener noreferrer" class="group flex flex-col sm:flex-row sm:items-center justify-between gap-3 py-5 px-4 hover:bg-paperAlt transition-colors print-break-inside">
+                        <div class="space-y-1.5 max-w-3xl">
+                            <div class="flex flex-wrap items-center gap-2 font-mono text-[11px]">
+                                <span class="px-2 py-0.5 rounded bg-paperAlt border border-rule text-ink font-semibold uppercase">Public News X</span>
+                                <span class="text-inkLight">•</span>
+                                <span class="text-inkMuted">Reporting &amp; Desk Bylines Archive</span>
+                            </div>
+                            <h3 class="font-serif text-lg sm:text-xl font-bold text-ink group-hover:text-accent transition-colors">
+                                Public News X Author Feed — Economy, AI Policy, National Affairs &amp; Geopolitics
+                            </h3>
+                            <p class="text-xs sm:text-sm text-inkMuted leading-relaxed">
+                                Ongoing reporting and desk coverage tracking regulatory developments, AI governance, parliamentary legislation, and West Asian geopolitical shifts.
+                            </p>
+                        </div>
+                        <span class="inline-flex items-center gap-1.5 font-mono text-xs font-semibold text-ink group-hover:text-accent shrink-0 self-start sm:self-center">
+                            Author Feed ↗
+                        </span>
+                    </a>
+
+                    <!-- Clip 4: VERITAS v1.0 Capstone Protocol (Live Reader) -->
+                    <div onclick="openVeritasModal()" class="group flex flex-col sm:flex-row sm:items-center justify-between gap-3 py-5 px-4 hover:bg-paperAlt transition-colors cursor-pointer print-break-inside">
+                        <div class="space-y-1.5 max-w-3xl">
+                            <div class="flex flex-wrap items-center gap-2 font-mono text-[11px]">
+                                <span class="px-2 py-0.5 rounded bg-ink text-paper font-semibold uppercase">ERAI Fellowship Capstone</span>
+                                <span class="text-inkLight">•</span>
+                                <span class="text-inkMuted">Co-Author (Team 1: Nigeria, India &amp; Sri Lanka, 2026)</span>
+                            </div>
+                            <h3 class="font-serif text-lg sm:text-xl font-bold text-ink group-hover:text-accent transition-colors">
+                                VERITAS v1.0 — Verification and Editorial Responsibility for Information Trustworthiness and Authentic Sourcing
+                            </h3>
+                            <p class="text-xs sm:text-sm text-inkMuted leading-relaxed">
+                                A research-grounded synthetic media and AI-misinformation verification protocol built for low-bandwidth, multilingual Global South newsrooms—featuring the 5-Stage &amp; RAPID workflows, 8-signal AI text analysis, and DART framing standards.
+                            </p>
+                        </div>
+                        <span class="inline-flex items-center gap-1.5 font-mono text-xs font-semibold text-accent group-hover:underline shrink-0 self-start sm:self-center">
+                            Open Live Reader →
+                        </span>
+                    </div>
+
+                    <!-- Clip 5: Delhi-NCR Winter Air Policy & E-Waste RTI Dossiers -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-rule">
+                        <div onclick="openCaseModal('air-pollution')" class="group p-4 hover:bg-paperAlt transition-colors cursor-pointer print-break-inside">
+                            <div class="font-mono text-[11px] text-accent font-semibold uppercase mb-1">Policy &amp; Environmental Analysis</div>
+                            <h4 class="font-serif text-lg font-bold text-ink group-hover:text-accent transition-colors mb-1">
+                                Winter Air Pollution in Delhi-NCR: Structural Causes &amp; Policy Blueprint
+                            </h4>
+                            <p class="text-xs text-inkMuted leading-relaxed mb-2">
+                                Synthesises CPCB monitoring data, stubble burning, vehicular emissions, and municipal dust control into a multi-agency mitigation roadmap.
+                            </p>
+                            <span class="font-mono text-[11px] font-semibold text-ink group-hover:text-accent">Inspect Policy Dossier →</span>
+                        </div>
+
+                        <div onclick="openCaseModal('ewaste-rti')" class="group p-4 hover:bg-paperAlt transition-colors cursor-pointer print-break-inside">
+                            <div class="font-mono text-[11px] text-accent font-semibold uppercase mb-1">RTI &amp; Regulatory Audit</div>
+                            <h4 class="font-serif text-lg font-bold text-ink group-hover:text-accent transition-colors mb-1">
+                                E-Waste EPR Compliance &amp; Informal Recycling Audit (RTI Framework)
+                            </h4>
+                            <p class="text-xs text-inkMuted leading-relaxed mb-2">
+                                Multi-jurisdictional Right to Information audit cross-referencing CPCB Extended Producer Responsibility filings against informal dismantling hubs.
+                            </p>
+                            <span class="font-mono text-[11px] font-semibold text-ink group-hover:text-accent">Inspect RTI Methodology →</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 5. FELLOWSHIPS, NEWSROOM EXPERIENCE & TOOLKIT (#experience) -->
+            <section id="experience" class="mb-14 scroll-mt-24 print-break-inside">
+                <div class="flex items-baseline justify-between border-b-2 border-ink pb-2.5 mb-6">
+                    <div>
+                        <span class="font-mono text-xs uppercase tracking-widest text-accent font-semibold">Credentials &amp; Training</span>
+                        <h2 class="font-serif text-2xl sm:text-3xl font-bold text-ink">Fellowships, Newsroom Experience &amp; Toolkit</h2>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Column 1: Newsroom & Fellowships -->
+                    <div class="md:col-span-2 space-y-4">
+                        <div class="p-4 rounded-lg border border-rule bg-paper">
+                            <div class="flex flex-wrap items-center justify-between gap-2 mb-1">
+                                <h3 class="font-serif text-lg font-bold text-ink">Sub Editor at Web Desk — Business Standard</h3>
+                                <span class="font-mono text-[11px] px-2 py-0.5 rounded bg-paperAlt border border-rule text-inkMuted">National Financial Daily</span>
+                            </div>
+                            <p class="text-xs sm:text-sm text-inkMuted leading-relaxed">
+                                Real-time digital desk editing, headline craft, wire verification, market/policy copy curation, and high-velocity breaking news packaging under strict accuracy standards.
+                            </p>
+                        </div>
+
+                        <div class="p-4 rounded-lg border border-rule bg-paper">
+                            <div class="flex flex-wrap items-center justify-between gap-2 mb-1">
+                                <h3 class="font-serif text-lg font-bold text-ink">
+                                    <a href="https://erai.knowledgenetworks.org/fellow/kamran-akhtar/" target="_blank" rel="noopener noreferrer" class="hover:text-accent underline decoration-rule underline-offset-4">
+                                        ERAI AI Journalism Fellow (Cohort 1) ↗
+                                    </a>
+                                </h3>
+                                <span class="font-mono text-[11px] px-2 py-0.5 rounded bg-accentLight text-accent font-semibold">Knowledge Networks</span>
+                            </div>
+                            <p class="text-xs sm:text-sm text-inkMuted leading-relaxed">
+                                Selected fellow on Ethics &amp; Responsible AI in journalism; co-authored the <button type="button" onclick="openVeritasModal()" class="text-accent font-semibold underline cursor-pointer">VERITAS v1.0</button> synthetic media verification framework for Global South newsrooms.
+                            </p>
+                        </div>
+
+                        <div class="p-4 rounded-lg border border-rule bg-paper">
+                            <div class="flex flex-wrap items-center justify-between gap-2 mb-1">
+                                <h3 class="font-serif text-lg font-bold text-ink">Academic Training &amp; Reporting Networks</h3>
+                                <span class="font-mono text-[11px] text-inkMuted">DSJ &amp; IIMC</span>
+                            </div>
+                            <p class="text-xs sm:text-sm text-inkMuted leading-relaxed">
+                                Trained at the <strong>Delhi School of Journalism (DSJ)</strong> and the <strong>Indian Institute of Mass Communication (IIMC)</strong>. Active contributor across <strong>Muslim Mirror</strong>, <strong>Public News X</strong>, <strong>Reporters101</strong>, and <strong>5wh.com</strong>.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Column 2: Investigative & Technical Toolkit -->
+                    <div class="p-5 rounded-lg border border-rule bg-paperAlt space-y-3">
+                        <div class="font-mono text-xs font-bold uppercase tracking-wider text-ink border-b border-rule pb-2">
+                            Editorial &amp; OSINT Stack
+                        </div>
+                        <ul class="space-y-2.5 font-mono text-xs text-inkMuted">
+                            <li class="flex justify-between gap-2">
+                                <span class="text-ink font-semibold">Verification:</span>
+                                <span class="text-right">InVID, FotoForensics, SunCalc, Audacity</span>
+                            </li>
+                            <li class="flex justify-between gap-2">
+                                <span class="text-ink font-semibold">Data &amp; Code:</span>
+                                <span class="text-right">Python (pandas, regex, thefuzz), SQL</span>
+                            </li>
+                            <li class="flex justify-between gap-2">
+                                <span class="text-ink font-semibold">Public Records:</span>
+                                <span class="text-right">RTI Act Audits, eCourts, CPCB, ECI</span>
+                            </li>
+                            <li class="flex justify-between gap-2">
+                                <span class="text-ink font-semibold">Visual &amp; Film:</span>
+                                <span class="text-right">Documentary Direction, Street Photo</span>
+                            </li>
+                            <li class="flex justify-between gap-2">
+                                <span class="text-ink font-semibold">Languages:</span>
+                                <span class="text-right">English, Hindi, Urdu</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 6. TECHIE SIGNATURE & LIVING WORK-IN-PROGRESS BUILD LOG (#build-log) -->
+            <section id="build-log" class="mb-12 scroll-mt-24 print-break-inside">
+                <div class="rounded-lg border border-ink bg-paperAlt p-5 sm:p-6 font-mono text-xs">
+                    <div class="flex flex-wrap items-center justify-between gap-3 pb-3 mb-4 border-b border-rule">
+                        <div class="flex items-center gap-2.5">
+                            <span class="px-2 py-0.5 rounded bg-ink text-paper font-bold uppercase tracking-wider text-[11px]">
+                                &lt;/&gt; ENGINEERING SIGNATURE &amp; BUILD LOG
+                            </span>
+                            <span class="text-inkMuted">MAINTAINED BY <strong class="text-ink">@kamran_reports</strong></span>
+                        </div>
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-amber-100 text-amber-950 border border-amber-300 font-semibold text-[11px]">
+                            <span class="w-2 h-2 rounded-full bg-amber-600 animate-pulse"></span>
+                            STATUS: WORK IN PROGRESS // LIVING ARCHIVE
+                        </span>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-12 gap-5 items-start">
+                        <div class="md:col-span-7 space-y-2 text-inkMuted leading-relaxed">
+                            <p class="text-ink font-semibold">
+                                Computational Journalism &amp; Zero-Dependency Broadsheet Architecture
+                            </p>
+                            <p>
+                                Engineered as a self-contained static HTML/CSS/SVG broadsheet for fast loading on constrained mobile networks, deterministic A4/Letter print tearsheets, and reproducible reporting workflows (Python <code class="text-ink">pandas</code>, <code class="text-ink">regex</code>, <code class="text-ink">thefuzz</code>, and VERITAS v1.0 verification protocols).
+                            </p>
+                            <p class="text-[11px] text-inkLight">
+                                Note to Fellowship Juries &amp; Commissioning Editors: This portfolio is an active, continuously updated working edition—new field photography, RTI filings, and ongoing investigations are staged here as they clear editorial verification.
+                            </p>
+                        </div>
+
+                        <div class="md:col-span-5 p-3.5 rounded border border-rule bg-paper space-y-2 text-[11px]">
+                            <div class="flex items-center justify-between border-b border-rule/70 pb-1.5">
+                                <span class="text-inkLight">BUILD REVISION</span>
+                                <span class="text-ink font-semibold">v2026.11-WIP (Living Edition)</span>
+                            </div>
+                            <div class="flex items-center justify-between border-b border-rule/70 pb-1.5">
+                                <span class="text-inkLight">HOSTED PHOTO LAYER</span>
+                                <a href="https://journalistkamran.github.io/portfolio/" target="_blank" rel="noopener noreferrer" class="text-accent font-semibold hover:underline">
+                                    journalistkamran.github.io ↗
+                                </a>
+                            </div>
+                            <div class="flex items-center justify-between border-b border-rule/70 pb-1.5">
+                                <span class="text-inkLight">PIPELINE QUEUE</span>
+                                <span class="text-ink">Transit &amp; Civic Audits [In Progress]</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-inkLight">ARCHITECTURE</span>
+                                <span class="text-ink">Single-File Static + Inline SVG</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 7. FOOTER COLOPHON -->
+            <footer class="pt-6 border-t-2 border-ink flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 font-mono text-xs text-inkMuted print-break-inside">
+                <div>
+                    <div class="font-bold text-ink uppercase">Kamran Akhtar — Multimedia &amp; Investigative Journalist</div>
+                    <div>Jamia Nagar, New Delhi • <span class="text-ink">@kamran_reports</span> • <span class="text-ink">hi.kamran.akhtar@gmail.com</span></div>
+                </div>
+                <div class="flex flex-wrap items-center gap-4">
+                    <a href="https://journalistkamran.github.io/portfolio/" target="_blank" rel="noopener noreferrer" class="hover:text-accent underline">Hosted Photo Edition ↗</a>
+                    <a href="https://publicnewsx.com/author/kamranakhtar/" target="_blank" rel="noopener noreferrer" class="hover:text-accent underline">Public News X ↗</a>
+                    <a href="https://erai.knowledgenetworks.org/fellow/kamran-akhtar/" target="_blank" rel="noopener noreferrer" class="hover:text-accent underline">ERAI Fellow ↗</a>
+                </div>
+            </footer>
+        </main>
+    </div>
+
+    <!-- MODAL 1: LIGHTBOX & FIELD DOSSIER MODAL -->
+    <div id="case-modal" class="no-print fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-sm p-3 sm:p-6 overflow-y-auto" onclick="closeCaseModal(event)">
+        <div class="bg-paper border border-ink rounded-xl max-w-4xl w-full max-h-[92vh] overflow-y-auto shadow-2xl" onclick="event.stopPropagation()">
+            <div class="sticky top-0 z-10 bg-paperAlt border-b border-rule px-5 py-3.5 flex items-center justify-between">
+                <div class="font-mono text-xs text-accent font-semibold uppercase" id="modal-category">FIELD DISPATCH</div>
+                <button onclick="closeCaseModal()" class="px-3 py-1 rounded bg-ink text-paper hover:bg-accent font-mono text-xs cursor-pointer">
+                    Close [ESC]
+                </button>
+            </div>
+            <div class="p-5 sm:p-8 space-y-6">
+                <div id="modal-gallery" class="space-y-4"></div>
+                <div>
+                    <div class="font-mono text-xs text-inkMuted mb-1" id="modal-meta"></div>
+                    <h3 class="font-serif text-2xl sm:text-3xl font-bold text-ink mb-3" id="modal-title"></h3>
+                    <p class="font-serif italic text-base text-inkMuted border-l-2 border-accent pl-4 mb-4" id="modal-caption"></p>
+                    <div class="text-sm sm:text-base text-ink leading-relaxed space-y-3" id="modal-body"></div>
+                </div>
+                <div class="p-4 rounded-lg bg-paperAlt border border-rule grid grid-cols-1 sm:grid-cols-3 gap-4" id="modal-highlights"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 2: LIVE INTERACTIVE VERITAS v1.0 PROTOCOL READER -->
+    <div id="veritas-modal" class="no-print fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-sm p-3 sm:p-6 overflow-y-auto" onclick="closeVeritasModal(event)">
+        <div class="bg-paper border border-ink rounded-xl max-w-4xl w-full max-h-[92vh] overflow-y-auto shadow-2xl" onclick="event.stopPropagation()">
+            <div class="sticky top-0 z-10 bg-ink text-paper px-5 py-4 flex flex-wrap items-center justify-between gap-2">
+                <div>
+                    <div class="font-mono text-[10px] uppercase tracking-widest text-red-400">ERAI Fellowship Capstone • Team 1 (Nigeria, India, Sri Lanka • 2026)</div>
+                    <h3 class="font-serif text-lg sm:text-xl font-bold">VERITAS v1.0 — Synthetic Media &amp; AI Verification Protocol</h3>
+                </div>
+                <button onclick="closeVeritasModal()" class="px-3 py-1.5 rounded bg-white/15 hover:bg-accent text-white font-mono text-xs cursor-pointer">
+                    Close [ESC]
+                </button>
+            </div>
+
+            <!-- VERITAS Tabs -->
+            <div class="bg-paperAlt border-b border-rule px-5 py-2.5 flex flex-wrap gap-2 font-mono text-xs">
+                <button onclick="switchVeritasTab('workflow')" data-vtab="workflow" class="vtab-btn px-3 py-1.5 rounded bg-ink text-paper font-semibold cursor-pointer">
+                    1. 5-Stage &amp; RAPID Workflow
+                </button>
+                <button onclick="switchVeritasTab('aitext')" data-vtab="aitext" class="vtab-btn px-3 py-1.5 rounded bg-paper border border-rule text-inkMuted hover:text-ink cursor-pointer">
+                    2. AI Text Protocol (8 Signals)
+                </button>
+                <button onclick="switchVeritasTab('toolkit')" data-vtab="toolkit" class="vtab-btn px-3 py-1.5 rounded bg-paper border border-rule text-inkMuted hover:text-ink cursor-pointer">
+                    3. Tiered Toolkit &amp; India Playbook
+                </button>
+                <button onclick="switchVeritasTab('checklist')" data-vtab="checklist" class="vtab-btn px-3 py-1.5 rounded bg-paper border border-rule text-inkMuted hover:text-ink cursor-pointer">
+                    4. One-Page Newsroom Checklist
+                </button>
+            </div>
+
+            <div id="veritas-tab-content" class="p-5 sm:p-7 space-y-5 text-sm text-ink leading-relaxed">
+                <!-- Hydrated by JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 3: PITCH & COMMISSION DRAWER -->
+    <div id="pitch-drawer" class="no-print fixed inset-0 z-50 hidden items-center justify-center bg-black/75 backdrop-blur-sm p-4" onclick="closePitchDrawer(event)">
+        <div class="bg-paper border border-ink rounded-xl max-w-lg w-full p-6 shadow-2xl space-y-4" onclick="event.stopPropagation()">
+            <div class="flex items-center justify-between border-b border-rule pb-3">
+                <div>
+                    <span class="font-mono text-[10px] uppercase tracking-widest text-accent font-semibold">Editorial Desk &amp; Fellowships</span>
+                    <h3 class="font-serif text-2xl font-bold text-ink">Contact Kamran Akhtar</h3>
+                </div>
+                <button onclick="closePitchDrawer()" class="px-2.5 py-1 rounded bg-paperAlt border border-rule font-mono text-xs cursor-pointer">✕</button>
+            </div>
+            <p class="text-xs sm:text-sm text-inkMuted leading-relaxed">
+                Available for investigative commissions, documentary assignments, data/RTI collaborations, and journalism fellowship inquiries.
+            </p>
+            <div class="space-y-2.5 font-mono text-xs">
+                <div class="p-3 rounded bg-paperAlt border border-rule flex items-center justify-between">
+                    <span>hi.kamran.akhtar@gmail.com</span>
+                    <button onclick="copyToClipboard('hi.kamran.akhtar@gmail.com', 'Email copied to clipboard')" class="px-2.5 py-1 rounded bg-ink text-paper hover:bg-accent cursor-pointer">Copy</button>
+                </div>
+                <div class="p-3 rounded bg-paperAlt border border-rule flex items-center justify-between">
+                    <span>Press Handle: @kamran_reports</span>
+                    <button onclick="copyToClipboard('@kamran_reports', 'Handle copied: @kamran_reports')" class="px-2.5 py-1 rounded bg-ink text-paper hover:bg-accent cursor-pointer">Copy</button>
+                </div>
+                <div class="p-3 rounded bg-paperAlt border border-rule flex items-center justify-between">
+                    <span>Hosted Photo Edition</span>
+                    <a href="https://journalistkamran.github.io/portfolio/" target="_blank" rel="noopener noreferrer" class="text-accent font-semibold underline">Open ↗</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION -->
+    <div id="toast" class="no-print fixed bottom-5 right-5 z-50 hidden items-center gap-2 px-4 py-2.5 rounded-lg bg-ink text-paper font-mono text-xs shadow-xl border border-white/15">
+        <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+        <span id="toast-text">Copied</span>
+    </div>
+
+    <script>
+        // Self-Contained Documentary SVG Plate Generator (Renders Crisp Editorial Plates Immediately)
+        function generateDocumentaryPlate(key, title, subtitle) {
+            const palettes = {
+                'invisible-avenue': { bg: '#181512', sky: '#2B241E', accent: '#C84B31', light: '#E6B87D', tag: 'OLD DELHI • MATIA MAHAL CORRIDOR' },
+                'meenapur-1': { bg: '#1B221C', sky: '#334236', accent: '#D49A42', light: '#E8DFCA', tag: 'MEENAPUR, BIHAR • FRAME I' },
+                'meenapur-2': { bg: '#211D18', sky: '#3E352B', accent: '#B85D3B', light: '#E5D7C1', tag: 'MEENAPUR, BIHAR • FRAME II' },
+                'jew-street-1': { bg: '#192229', sky: '#2C3E4C', accent: '#C97B4B', light: '#EFE6D5', tag: 'MATTANCHERRY, FORT KOCHI • FRAME I' },
+                'jew-street-2': { bg: '#221E1A', sky: '#3B332B', accent: '#8F5B3C', light: '#EAE0CE', tag: 'MATTANCHERRY, FORT KOCHI • FRAME II' },
+                'delhi-after-dark': { bg: '#0D1117', sky: '#161F2C', accent: '#E09F3E', light: '#9EC1CF', tag: 'DELHI-NCR • 01:30 HRS NIGHT SHIFT' },
+                'manual-sewage': { bg: '#161614', sky: '#262522', accent: '#B54434', light: '#C8C2B6', tag: 'MUNICIPAL SEWER LINE • CIVIC AUDIT' },
+                'energy-crisis': { bg: '#1F1815', sky: '#3A2922', accent: '#D95D39', light: '#F2C57C', tag: 'STRAIT CHOKEPOINTS → LPG SUPPLY' },
+                'kashmir-1': { bg: '#132026', sky: '#27404C', accent: '#5C9EAD', light: '#E4EEF0', tag: 'KASHMIR HIMALAYAS • FRAME I' },
+                'kashmir-2': { bg: '#18241E', sky: '#2E4439', accent: '#7FA98B', light: '#E6EDE8', tag: 'KASHMIR HIMALAYAS • FRAME II' },
+                'rubber-farmers': { bg: '#182117', sky: '#2D3E2B', accent: '#C28B38', light: '#E8E2D0', tag: 'PLANTATION BELT • DAWN LATEX TAP' }
+            };
+            const p = palettes[key] || palettes['invisible-avenue'];
+            const svg = `
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 750" width="1200" height="750">
+                    <defs>
+                        <linearGradient id="g-${key}" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stop-color="${p.sky}"/>
+                            <stop offset="65%" stop-color="${p.bg}"/>
+                            <stop offset="100%" stop-color="#0A0A09"/>
+                        </linearGradient>
+                        <radialGradient id="l-${key}" cx="50%" cy="38%" r="55%">
+                            <stop offset="0%" stop-color="${p.light}" stop-opacity="0.22"/>
+                            <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+                        </radialGradient>
+                    </defs>
+                    <rect width="1200" height="750" fill="url(#g-${key})"/>
+                    <rect width="1200" height="750" fill="url(#l-${key})"/>
+                    <!-- Architectural & Horizon Silhouettes -->
+                    <path d="M0 540 Q 260 495, 520 530 T 1200 510 L 1200 750 L 0 750 Z" fill="#0B0B0A" opacity="0.88"/>
+                    <rect x="85" y="210" width="210" height="330" fill="#10100E" opacity="0.72"/>
+                    <rect x="330" y="260" width="170" height="280" fill="#121210" opacity="0.65"/>
+                    <rect x="760" y="190" width="240" height="350" fill="#10100E" opacity="0.72"/>
+                    <rect x="1030" y="250" width="120" height="290" fill="#121210" opacity="0.6"/>
+                    <!-- Documentary Viewfinder Frame Lines -->
+                    <rect x="44" y="44" width="1112" height="662" fill="none" stroke="${p.light}" stroke-opacity="0.24" stroke-width="1.5"/>
+                    <line x1="600" y1="44" x2="600" y2="74" stroke="${p.light}" stroke-opacity="0.35" stroke-width="1.5"/>
+                    <line x1="600" y1="676" x2="600" y2="706" stroke="${p.light}" stroke-opacity="0.35" stroke-width="1.5"/>
+                    <line x1="44" y1="375" x2="74" y2="375" stroke="${p.light}" stroke-opacity="0.35" stroke-width="1.5"/>
+                    <line x1="1126" y1="375" x2="1156" y2="375" stroke="${p.light}" stroke-opacity="0.35" stroke-width="1.5"/>
+                    <!-- Plate Metadata & Title -->
+                    <rect x="72" y="72" width="14" height="14" fill="${p.accent}"/>
+                    <text x="98" y="84" fill="${p.light}" font-family="monospace" font-size="18" letter-spacing="3" opacity="0.88">${p.tag}</text>
+                    <text x="72" y="610" fill="#FFFFFF" font-family="Georgia, serif" font-size="44" font-weight="bold">${title}</text>
+                    <text x="72" y="650" fill="${p.light}" font-family="monospace" font-size="19" opacity="0.85">${subtitle}</text>
+                </svg>
+            `.trim();
+            return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+        }
+
+        // Multi-path image fallback loader (checks ./, images/, assets/ before rendering documentary SVG plate)
+        function handleImageFallback(imgEl, plateKey, title, subtitle) {
+            const tried = parseInt(imgEl.dataset.fallbackStep || '0', 10);
+            const candidates = (imgEl.dataset.fallbacks || '').split(',').filter(Boolean);
+            if (tried < candidates.length) {
+                imgEl.dataset.fallbackStep = String(tried + 1);
+                imgEl.src = candidates[tried];
+                return;
+            }
+            imgEl.onerror = null;
+            imgEl.src = generateDocumentaryPlate(plateKey, title, subtitle);
+        }
+
+        // Story Data (All 8 Visual Dispatches + 2 Policy/RTI Dossiers)
+        const storiesData = {
+            'invisible-avenue': {
+                id: 'invisible-avenue',
+                title: 'Invisible on the Avenue',
+                categoryLabel: 'Photojournalism & Urban Life',
+                outlet: 'Old Delhi Street Dispatch',
+                cameraMeta: 'OLD DELHI • 28.6507° N, 77.2334° E • 35MM',
+                caption: 'A barefoot child visibly consuming intoxicants walks a busy Delhi street outside Zahra and Al-Jawahar Restaurant. LPG cylinders are stacked on a cart behind him. The crowd moves around him as though he is not there.',
+                body: [
+                    'Captured along the dense commercial artery outside Zahra and Al-Jawahar Restaurant near Jama Masjid in Old Delhi, this frame examines the normalization of child substance abuse alongside everyday urban commerce and hazardous fuel transport.',
+                    'Within a single street corridor, street-connected minors navigate heavy pedestrian traffic and stacked domestic LPG cylinders with virtually no child-protection intervention.'
+                ],
+                plates: [
+                    { key: 'invisible-avenue', src: 'edited-image.jpg', label: 'Frame 01 — Matia Mahal / Outside Zahra & Al-Jawahar Restaurant, Old Delhi' }
+                ],
+                highlights: [
+                    { label: 'Location', value: 'Old Delhi, NCR' },
+                    { label: 'Focus', value: 'Child Welfare & Urban Space' },
+                    { label: 'Format', value: 'Street Photojournalism' }
+                ]
+            },
+            'meenapur': {
+                id: 'meenapur',
+                anchor: 'meenapur',
+                categories: ['photojournalism'],
+                categoryLabel: 'PHOTOJOURNALISM & FIELD',
+                outlet: 'Meenapur, Bihar • Two-Frame Spread',
+                cameraMeta: 'CONTACT SHEET 02 // MEENAPUR, BIHAR • 28MM',
+                title: 'Meenapur: Agrarian Margins & Rural Infrastructure',
+                caption: 'Two-frame visual dispatch from Meenapur block in Bihar, documenting rural livelihoods, flood-plain resilience, and public service delivery gaps.',
+                summary: 'Ground photo essay tracing everyday life, seasonal flood vulnerability, and state welfare access across rural households in Meenapur, Bihar.',
+                body: [
+                    'Reported on the ground in Meenapur, Bihar, this two-frame visual spread pairs environmental portraiture with infrastructure documentation to examine how rural households navigate recurring flood-plain disruption and uneven welfare delivery.'
+                ],
+                plates: [
+                    { key: 'meenapur-1', label: 'Frame I — Rural settlement & flood-plain embankment, Meenapur' },
+                    { key: 'meenapur-2', label: 'Frame II — Household economy & agrarian labour, Meenapur' }
+                ],
+                highlights: [
+                    { label: 'Region', value: 'Meenapur, Bihar' },
+                    { label: 'Spread', value: '2 Documentary Frames' },
+                    { label: 'Beat', value: 'Rural Governance' }
+                ]
+            },
+            'jew-street': {
+                id: 'jew-street',
+                anchor: 'jewstreet',
+                categories: ['photojournalism'],
+                categoryLabel: 'PHOTOJOURNALISM & FIELD',
+                outlet: 'Mattancherry, Fort Kochi • Two-Frame Spread',
+                cameraMeta: 'CONTACT SHEET 03 // FORT KOCHI • 9.9576° N • 35MM',
+                title: 'Jew Street, Fort Kochi: Memory, Trade & Layered Heritage',
+                caption: 'Two-frame photographic essay from Mattancherry’s historic spice and antique quarter, tracing living memory alongside heritage tourism.',
+                summary: 'Visual chronicle of Mattancherry’s Jew Street in Fort Kochi—balancing centuries-old mercantile architecture against contemporary tourism pressures.',
+                body: [
+                    'Photographed in Mattancherry, Fort Kochi, this two-frame study looks past postcard heritage tropes to document the shopkeepers, craft restorers, and aging masonry that sustain Jew Street’s layered cultural history.'
+                ],
+                plates: [
+                    { key: 'jew-street-1', label: 'Frame I — Historic spice & antique storefronts, Jew Street' },
+                    { key: 'jew-street-2', label: 'Frame II — Courtyard masonry & afternoon light, Mattancherry' }
+                ],
+                highlights: [
+                    { label: 'Location', value: 'Fort Kochi, Kerala' },
+                    { label: 'Spread', value: '2 Documentary Frames' },
+                    { label: 'Beat', value: 'Cultural Heritage' }
+                ]
+            },
+            'delhi-after-dark': {
+                id: 'delhi-after-dark',
+                anchor: 'delhi',
+                categories: ['photojournalism'],
+                categoryLabel: 'PHOTOJOURNALISM & FIELD',
+                outlet: 'Delhi-NCR Night Reportage • 2-Frame Sequence',
+                cameraMeta: 'CONTACT SHEET 04 // DELHI-NCR • 01:30 HRS',
+                title: 'Delhi After Dark: Sleepers on the Median',
+                caption: 'Wrapped in a striped blanket atop a black-and-yellow concrete road divider in central New Delhi, an unhoused resident sleeps inches from speeding auto-rickshaws as a blue floodlight illuminates the red-brick wall behind.',
+                summary: 'Animated two-frame night sequence contrasting motion-blurred auto-rickshaws hurtling past a central road divider against the quiet stillness of a sleeper wrapped beneath winter trees.',
+                body: [
+                    'Photographed past midnight along a wide arterial boulevard in New Delhi, this two-frame sequence captures the precarious reality of unhoused residents sleeping on narrow concrete medians while green-and-yellow auto-rickshaws blur past inches away.',
+                    'Alternating between kinetic traffic streak and nocturnal stillness, the diptych examines urban invisibility, winter exposure, and the absence of accessible night shelters along major transit corridors.'
+                ],
+                animatedSequence: true,
+                plates: [
+                    { key: 'delhi-after-dark', src: 'image_9ef244.jpg', label: 'Frame I (Kinetic) — Motion-blurred auto-rickshaws passing a sleeper on the central median' },
+                    { key: 'delhi-after-dark', src: 'image_9ef528.jpg', label: 'Frame II (Stillness) — Concrete divider, striped blanket & nocturnal streetlamp, New Delhi' }
+                ],
+                highlights: [
+                    { label: 'Window', value: '00:00 – 04:00 HRS' },
+                    { label: 'Sequence', value: '2 Animated Frames' },
+                    { label: 'Region', value: 'New Delhi, NCR' }
+                ]
+            },
+            'manual-sewage': {
+                id: 'manual-sewage',
+                anchor: 'sewage',
+                categories: ['photojournalism'],
+                categoryLabel: 'PHOTOJOURNALISM & FIELD',
+                outlet: 'Investigative Civic & Labour Reportage',
+                cameraMeta: 'CONTACT SHEET 05 // MUNICIPAL SEWER LINE',
+                title: 'Manual Sewage: Caste, Subterranean Risk & State Neglect',
+                caption: 'Sanitation workers confront toxic subterranean hazards without protective gear—exposing the persistence of prohibited manual scavenging.',
+                summary: 'Field documentation of hazardous sewer cleaning practices, interrogating the gap between statutory bans, mechanization claims, and ground reality.',
+                body: [
+                    'Despite statutory prohibitions and judicial directives mandating mechanized cleaning, sanitation workers continue to enter live sewer lines without respiratory protection or safety harnesses. This visual record documents the human cost of municipal subcontracting.'
+                ],
+                plates: [
+                    { key: 'manual-sewage', label: 'Subterranean municipal drain maintenance without PPE' }
+                ],
+                highlights: [
+                    { label: 'Theme', value: 'Labour & Human Rights' },
+                    { label: 'Law', value: 'PEMSR Act Compliance' },
+                    { label: 'Evidence', value: 'Field Visual Record' }
+                ]
+            },
+            'energy-crisis': {
+                id: 'energy-crisis',
+                anchor: 'energy',
+                categories: ['documentary-ecology'],
+                categoryLabel: 'ENERGY & GEOPOLITICS',
+                outlet: 'Supply Chain & Geopolitical Dispatch',
+                cameraMeta: 'CONTACT SHEET 06 // STRAIT CHOKEPOINTS → LPG',
+                title: 'Energy Crisis During the West Asia Crisis',
+                caption: 'From West Asian maritime chokepoints to domestic LPG cylinder queues: tracing how geopolitical conflict translates into household energy strain.',
+                summary: 'Connects West Asian shipping disruptions and crude/LNG price volatility to local fuel distribution pressures and household budgets.',
+                body: [
+                    'Escalating hostilities across West Asian maritime corridors directly threaten South Asia’s hydrocarbon import lifelines. This dispatch traces the transmission chain from tanker insurance spikes to domestic LPG depots and small-business fuel costs.'
+                ],
+                plates: [
+                    { key: 'energy-crisis', label: 'Domestic LPG distribution & supply-chain bottleneck' }
+                ],
+                highlights: [
+                    { label: 'Scope', value: 'West Asia → India Supply' },
+                    { label: 'Focus', value: 'LPG & Fuel Security' },
+                    { label: 'Beat', value: 'Geopolitics & Economy' }
+                ]
+            },
+            'kashmir-ecology': {
+                id: 'kashmir-ecology',
+                anchor: 'kashmir',
+                categories: ['documentary-ecology', 'photojournalism'],
+                categoryLabel: 'ECOLOGY & FIELD',
+                outlet: 'Himalayan Environmental Reportage • Two-Frame Spread',
+                cameraMeta: 'CONTACT SHEET 07 // KASHMIR HIMALAYAS • 34.0837° N',
+                title: 'Kashmir Ecology: Fragile Watersheds & Alpine Climate Stress',
+                caption: 'Two-frame environmental dispatch from the Kashmir Valley, examining glacial retreat, wetland encroachment, and erratic snowfall.',
+                summary: 'Two-frame visual reportage on Himalayan watershed fragility, shrinking wetlands, and climate-driven agricultural uncertainty in Kashmir.',
+                body: [
+                    'Across the Kashmir Valley, erratic winter precipitation, receding glaciers, and rapid construction along flood-absorption wetlands are reshaping both mountain ecology and downstream horticulture.'
+                ],
+                plates: [
+                    { key: 'kashmir-1', label: 'Frame I — Alpine watershed & high-altitude valley, Kashmir' },
+                    { key: 'kashmir-2', label: 'Frame II — Wetland buffer & seasonal water stress, Kashmir' }
+                ],
+                highlights: [
+                    { label: 'Region', value: 'Kashmir Valley' },
+                    { label: 'Spread', value: '2 Documentary Frames' },
+                    { label: 'Beat', value: 'Climate & Ecology' }
+                ]
+            },
+            'rubber-farmers': {
+                id: 'rubber-farmers',
+                anchor: 'rubber',
+                categories: ['documentary-ecology'],
+                categoryLabel: 'FEATURE DOCUMENTARY',
+                outlet: 'Independent Documentary Film',
+                cameraMeta: 'CONTACT SHEET 08 // PLANTATION BELT • 05:15 HRS',
+                title: 'Rubber Farmers: Dawn Latex Tapping & Agrarian Volatility',
+                caption: 'Dawn latex tapping and smallholder plantations: chronicling agrarian distress, climate shifts, and global price volatility in the rubber belt.',
+                summary: 'Independent documentary film following smallholder rubber tappers at dawn—exploring latex price swings, fungal leaf-fall disease, and rural debt.',
+                body: [
+                    'Filmed on location during pre-dawn tapping shifts, this documentary follows smallholder rubber cultivators navigating volatile global commodity prices, unseasonal rainfall that disrupts tapping days, and rising input costs.'
+                ],
+                plates: [
+                    { key: 'rubber-farmers', label: 'Pre-dawn latex tapping in smallholder rubber plantation' }
+                ],
+                highlights: [
+                    { label: 'Role', value: 'Director & Producer' },
+                    { label: 'Format', value: 'Documentary Film' },
+                    { label: 'Theme', value: 'Agrarian Economy' }
+                ]
+            },
+            'air-pollution': {
+                id: 'air-pollution',
+                title: 'Winter Air Pollution in Delhi-NCR: Structural Causes & Policy Blueprint',
+                categoryLabel: 'Policy & Environmental Analysis',
+                outlet: 'Environmental Policy Dossier',
+                cameraMeta: 'DELHI-NCR AIRSHED • CPCB DATA SYNTHESIS',
+                caption: 'A structural breakdown of winter PM2.5 spikes across the Indo-Gangetic airshed—moving beyond emergency GRAP bans toward year-round emissions reform.',
+                body: [
+                    'Every November, Delhi-NCR enters a predictable public-health emergency as meteorological inversion traps emissions from transport, industrial clusters, construction dust, and seasonal crop-residue burning.',
+                    'This policy blueprint synthesises CPCB source-apportionment studies and regional airshed governance models to outline enforceable year-round interventions.'
+                ],
+                plates: [],
+                highlights: [
+                    { label: 'Airshed', value: 'Delhi-NCR / IGP' },
+                    { label: 'Data', value: 'CPCB & Source Studies' },
+                    { label: 'Focus', value: 'Public Health Policy' }
+                ]
+            },
+            'ewaste-rti': {
+                id: 'ewaste-rti',
+                title: 'E-Waste EPR Compliance & Informal Recycling Audit (RTI Framework)',
+                categoryLabel: 'RTI & Regulatory Audit',
+                outlet: 'Public Records & Environmental Investigation',
+                cameraMeta: 'RTI ACT 2005 • CPCB EPR PORTAL AUDIT',
+                caption: 'Cross-referencing statutory Extended Producer Responsibility (EPR) collection targets against ground-level informal dismantling hubs.',
+                body: [
+                    'Designed around targeted Right to Information (RTI) filings to central and state pollution control boards, this investigative framework audits discrepancies between paper recycling certificates issued under E-Waste Management Rules and actual hazardous processing in informal clusters.'
+                ],
+                plates: [],
+                highlights: [
+                    { label: 'Method', value: 'RTI + CPCB Filings' },
+                    { label: 'Focus', value: 'EPR Accountability' },
+                    { label: 'Beat', value: 'Environment & Law' }
+                ]
+            }
+        };
+
+        const customPhotoStore = {};
+        let pendingUploadTarget = null;
+        const sequenceState = {
+            'delhi-after-dark': { activeIdx: 0, playing: true }
+        };
+
+        function getPlateSrc(storyId, plateIdx, plateKey, title, subtitle, explicitSrc) {
+            const storeKey = `${storyId}-${plateIdx}`;
+            if (customPhotoStore[storeKey]) return customPhotoStore[storeKey];
+            if (explicitSrc) return explicitSrc;
+            return generateDocumentaryPlate(plateKey, title, subtitle);
+        }
+
+        function triggerPhotoUpload(storyId, plateIdx) {
+            pendingUploadTarget = { storyId, plateIdx };
+            document.getElementById('local-photo-input').click();
+        }
+
+        function handleLocalPhotoSelected(event) {
+            const file = event.target.files && event.target.files[0];
+            if (!file || !pendingUploadTarget) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const { storyId, plateIdx } = pendingUploadTarget;
+                customPhotoStore[`${storyId}-${plateIdx}`] = e.target.result;
+                if (storyId === 'invisible-avenue') {
+                    hydrateLeadImage();
+                } else {
+                    const activeBtn = document.querySelector('.filter-btn.bg-ink');
+                    renderStories(activeBtn ? activeBtn.dataset.filter : 'all');
+                }
+                showToast('Local photo loaded into frame');
+            };
+            reader.readAsDataURL(file);
+            event.target.value = '';
+        }
+
+        function handleBatchPhotosSelected(event) {
+            const files = Array.from(event.target.files || []);
+            if (!files.length) return;
+            let loadedCount = 0;
+            files.forEach((file, idx) => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const name = file.name.toLowerCase();
+                    if (name.includes('edited') || (files.length >= 3 && idx === 2) || (files.length === 1 && idx === 0)) {
+                        customPhotoStore['invisible-avenue-0'] = e.target.result;
+                    } else if (name.includes('9ef244') || idx === 0) {
+                        customPhotoStore['delhi-after-dark-0'] = e.target.result;
+                    } else if (name.includes('9ef528') || idx === 1) {
+                        customPhotoStore['delhi-after-dark-1'] = e.target.result;
+                    }
+                    loadedCount++;
+                    if (loadedCount === files.length) {
+                        hydrateLeadImage();
+                        const activeBtn = document.querySelector('.filter-btn.bg-ink');
+                        renderStories(activeBtn ? activeBtn.dataset.filter : 'all');
+                        showToast(`Loaded ${loadedCount} photo(s) into portfolio frames`);
+                    }
+                };
+                reader.readAsDataURL(file);
+            });
+            event.target.value = '';
+        }
+
+        function hydrateLeadImage() {
+            const lead = storiesData['invisible-avenue'];
+            const img = document.getElementById('img-lead-invisible-avenue');
+            if (img && lead) {
+                const leadPlate = lead.plates[0];
+                img.dataset.fallbackStep = '0';
+                img.onerror = function() {
+                    handleImageFallback(this, 'invisible-avenue', lead.title, 'Old Delhi • Matia Mahal / Jama Masjid Corridor');
+                };
+                img.src = getPlateSrc('invisible-avenue', 0, 'invisible-avenue', lead.title, 'Old Delhi • Matia Mahal / Jama Masjid Corridor', leadPlate.src);
+            }
+            switchArchivePlate('invisible-avenue', 'PLATE PREVIEW 01 // OLD DELHI STREET');
+        }
+
+        function switchArchivePlate(plateKey, label) {
+            const previewImg = document.getElementById('archive-preview-img');
+            const previewLabel = document.getElementById('archive-preview-label');
+            const titles = {
+                'invisible-avenue': 'Invisible on the Avenue',
+                'meenapur-1': 'Meenapur: Agrarian Margins',
+                'jew-street-1': 'Jew Street, Fort Kochi',
+                'kashmir-1': 'Kashmir Ecology: Fragile Watersheds'
+            };
+            if (previewImg) {
+                if (plateKey === 'invisible-avenue') {
+                    previewImg.dataset.fallbackStep = '0';
+                    previewImg.onerror = function() {
+                        handleImageFallback(this, 'invisible-avenue', 'Invisible on the Avenue', 'Hosted High-Resolution Visual Layer • GitHub Pages');
+                    };
+                    previewImg.src = getPlateSrc('invisible-avenue', 0, 'invisible-avenue', 'Invisible on the Avenue', 'Hosted High-Resolution Visual Layer • GitHub Pages', 'edited-image.jpg');
+                } else {
+                    previewImg.onerror = null;
+                    previewImg.src = generateDocumentaryPlate(plateKey, titles[plateKey] || 'Photographic Archive', 'Hosted High-Resolution Visual Layer • GitHub Pages');
+                }
+            }
+            if (previewLabel) {
+                previewLabel.textContent = label;
+            }
+        }
+
+        function setSequenceFrame(storyId, idx) {
+            if (!sequenceState[storyId]) sequenceState[storyId] = { activeIdx: 0, playing: true };
+            sequenceState[storyId].activeIdx = idx;
+            updateSequenceDOM(storyId);
+        }
+
+        function toggleSequencePlay(storyId) {
+            if (!sequenceState[storyId]) sequenceState[storyId] = { activeIdx: 0, playing: true };
+            sequenceState[storyId].playing = !sequenceState[storyId].playing;
+            updateSequenceDOM(storyId);
+        }
+
+        function updateSequenceDOM(storyId) {
+            const st = sequenceState[storyId];
+            if (!st) return;
+            const img0 = document.getElementById(`seq-img-${storyId}-0`);
+            const img1 = document.getElementById(`seq-img-${storyId}-1`);
+            const btn0 = document.getElementById(`seq-btn-${storyId}-0`);
+            const btn1 = document.getElementById(`seq-btn-${storyId}-1`);
+            const playBtn = document.getElementById(`seq-play-${storyId}`);
+            if (img0 && img1) {
+                img0.style.opacity = st.activeIdx === 0 ? '1' : '0';
+                img1.style.opacity = st.activeIdx === 1 ? '1' : '0';
+            }
+            if (btn0 && btn1) {
+                btn0.className = st.activeIdx === 0
+                    ? 'px-2 py-0.5 rounded bg-accent text-white font-mono text-[9px] font-semibold cursor-pointer'
+                    : 'px-2 py-0.5 rounded bg-black/70 text-white/75 hover:text-white font-mono text-[9px] border border-white/20 cursor-pointer';
+                btn1.className = st.activeIdx === 1
+                    ? 'px-2 py-0.5 rounded bg-accent text-white font-mono text-[9px] font-semibold cursor-pointer'
+                    : 'px-2 py-0.5 rounded bg-black/70 text-white/75 hover:text-white font-mono text-[9px] border border-white/20 cursor-pointer';
+            }
+            if (playBtn) {
+                playBtn.textContent = st.playing ? '❚❚ AUTO' : '▶ PLAY';
+            }
+        }
+
+        function renderStories(filter = 'all') {
+            const container = document.getElementById('stories-grid');
+            if (!container) return;
+
+            const gridKeys = ['meenapur', 'jew-street', 'delhi-after-dark', 'manual-sewage', 'energy-crisis', 'kashmir-ecology', 'rubber-farmers'];
+            const items = gridKeys.map(k => storiesData[k]).filter(item => {
+                if (filter === 'all') return true;
+                return item.categories && item.categories.includes(filter);
+            });
+
+            container.innerHTML = items.map((story, cardIndex) => {
+                const kbClass = cardIndex % 2 === 0 ? 'ken-burns-card' : 'ken-burns-card-alt';
+                const isSequence = Boolean(story.animatedSequence && story.plates.length > 1);
+                const isTwoFrame = !isSequence && story.plates.length > 1;
+
+                let mediaHtml = '';
+                if (isSequence) {
+                    const st = sequenceState[story.id] || { activeIdx: 0, playing: true };
+                    const src0 = getPlateSrc(story.id, 0, story.plates[0].key, story.title, story.plates[0].label, story.plates[0].src);
+                    const src1 = getPlateSrc(story.id, 1, story.plates[1].key, story.title, story.plates[1].label, story.plates[1].src);
+                    mediaHtml = `
+                        <div class="photo-frame aspect-[16/10] relative group/frame">
+                            <img id="seq-img-${story.id}-0" src="${src0}" data-fallbacks="images/image_9ef244.jpg,assets/image_9ef244.jpg" onerror="handleImageFallback(this, 'delhi-after-dark', '${story.title}', 'Frame I • Kinetic')" alt="${story.plates[0].label}" class="absolute inset-0 w-full h-full object-cover ken-burns-card" style="opacity: ${st.activeIdx === 0 ? 1 : 0};">
+                            <img id="seq-img-${story.id}-1" src="${src1}" data-fallbacks="images/image_9ef528.jpg,assets/image_9ef528.jpg" onerror="handleImageFallback(this, 'delhi-after-dark', '${story.title}', 'Frame II • Stillness')" alt="${story.plates[1].label}" class="absolute inset-0 w-full h-full object-cover ken-burns-card-alt" style="opacity: ${st.activeIdx === 1 ? 1 : 0};">
+                            <div class="no-print absolute top-2.5 left-2.5 z-10 flex items-center gap-1.5">
+                                <button type="button" id="seq-play-${story.id}" onclick="event.stopPropagation(); toggleSequencePlay('${story.id}')" class="px-2 py-0.5 rounded bg-black/80 text-emerald-300 font-mono text-[9px] font-semibold border border-white/20 cursor-pointer">
+                                    ${st.playing ? '❚❚ AUTO' : '▶ PLAY'}
+                                </button>
+                                <button type="button" id="seq-btn-${story.id}-0" onclick="event.stopPropagation(); setSequenceFrame('${story.id}', 0)" class="${st.activeIdx === 0 ? 'px-2 py-0.5 rounded bg-accent text-white font-mono text-[9px] font-semibold cursor-pointer' : 'px-2 py-0.5 rounded bg-black/70 text-white/75 hover:text-white font-mono text-[9px] border border-white/20 cursor-pointer'}">
+                                    01
+                                </button>
+                                <button type="button" id="seq-btn-${story.id}-1" onclick="event.stopPropagation(); setSequenceFrame('${story.id}', 1)" class="${st.activeIdx === 1 ? 'px-2 py-0.5 rounded bg-accent text-white font-mono text-[9px] font-semibold cursor-pointer' : 'px-2 py-0.5 rounded bg-black/70 text-white/75 hover:text-white font-mono text-[9px] border border-white/20 cursor-pointer'}">
+                                    02
+                                </button>
+                            </div>
+                            <div class="no-print absolute bottom-2.5 right-2.5 z-10 flex items-center gap-1.5">
+                                <button type="button" onclick="event.stopPropagation(); triggerPhotoUpload('${story.id}', 0)" class="px-2 py-0.5 rounded bg-black/85 hover:bg-accent text-white font-mono text-[9px] uppercase border border-white/25 cursor-pointer">
+                                    Load #1
+                                </button>
+                                <button type="button" onclick="event.stopPropagation(); triggerPhotoUpload('${story.id}', 1)" class="px-2 py-0.5 rounded bg-black/85 hover:bg-accent text-white font-mono text-[9px] uppercase border border-white/25 cursor-pointer">
+                                    Load #2
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                } else if (isTwoFrame) {
+                    mediaHtml = `<div class="grid grid-cols-2 gap-0.5 bg-ink">
+                        ${story.plates.map((pl, idx) => `
+                            <div class="photo-frame aspect-[4/3] relative group/frame">
+                                <img src="${getPlateSrc(story.id, idx, pl.key, story.title, pl.label, pl.src)}" alt="${pl.label}" class="w-full h-full object-cover ${idx === 0 ? 'ken-burns-card' : 'ken-burns-card-alt'}">
+                                <button type="button" onclick="event.stopPropagation(); triggerPhotoUpload('${story.id}', ${idx})" class="no-print absolute bottom-2 right-2 z-10 px-2 py-0.5 rounded bg-black/85 hover:bg-accent text-white font-mono text-[9px] uppercase border border-white/25 transition-colors cursor-pointer">
+                                    Load #${idx + 1}
+                                </button>
+                            </div>
+                        `).join('')}
+                       </div>`;
+                } else {
+                    mediaHtml = `<div class="photo-frame aspect-[16/10] relative">
+                        <img src="${getPlateSrc(story.id, 0, story.plates[0].key, story.title, story.plates[0].label, story.plates[0].src)}" alt="${story.title}" class="w-full h-full object-cover ${kbClass}">
+                        <button type="button" onclick="event.stopPropagation(); triggerPhotoUpload('${story.id}', 0)" class="no-print absolute bottom-2.5 right-2.5 z-10 px-2.5 py-1 rounded bg-black/85 hover:bg-accent text-white font-mono text-[10px] uppercase border border-white/25 transition-colors cursor-pointer">
+                            Load Photo
+                        </button>
+                       </div>`;
+                }
+
+                return `
+                    <article id="${story.anchor}" onclick="openCaseModal('${story.id}')" class="group rounded-xl border border-rule bg-paper overflow-hidden hover:border-ink hover:shadow-lg transition-all cursor-pointer flex flex-col justify-between print-break-inside scroll-mt-24">
+                        <div>
+                            ${mediaHtml}
+                            <div class="bg-darkroom text-white/80 px-4 py-1.5 flex items-center justify-between gap-2 font-mono text-[10px] tracking-wider uppercase">
+                                <span class="truncate">${story.cameraMeta}</span>
+                                <span class="text-white/50 shrink-0">${isSequence ? 'ANIMATED DIPTYCH' : (isTwoFrame ? '2 PLATES' : 'ANIMATED PLATE')}</span>
+                            </div>
+                            <div class="p-5">
+                                <div class="flex flex-wrap items-center gap-2 mb-2">
+                                    <span class="px-2 py-0.5 rounded bg-accentLight text-accent font-mono text-[10px] font-semibold uppercase">
+                                        ${story.categoryLabel}
+                                    </span>
+                                    <span class="font-mono text-[11px] text-inkMuted">${story.outlet}</span>
+                                </div>
+                                <h3 class="font-serif text-xl font-bold text-ink group-hover:text-accent transition-colors leading-snug mb-2">
+                                    ${story.title}
+                                </h3>
+                                <p class="font-serif italic text-xs text-inkLight leading-relaxed border-l-2 border-rule pl-2.5 mb-2.5">
+                                    ${story.caption}
+                                </p>
+                                <p class="text-xs sm:text-sm text-inkMuted leading-relaxed">
+                                    ${story.summary}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="px-5 pb-5">
+                            <div class="grid grid-cols-3 gap-2 p-2.5 rounded bg-paperAlt border border-rule/70 mb-3">
+                                ${story.highlights.map(h => `
+                                    <div>
+                                        <div class="font-mono text-[9px] uppercase text-inkLight truncate">${h.label}</div>
+                                        <div class="font-mono text-[11px] font-medium text-ink truncate">${h.value}</div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                            <div class="flex items-center justify-between font-mono text-xs pt-1 border-t border-rule/60">
+                                <span class="text-inkLight text-[11px]">Field Dossier</span>
+                                <span class="no-print font-semibold text-ink group-hover:text-accent">Inspect Story →</span>
+                            </div>
+                        </div>
+                    </article>
+                `;
+            }).join('');
+        }
+
+        function filterStories(filter) {
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                const isActive = btn.dataset.filter === filter;
+                btn.className = isActive
+                    ? 'filter-btn px-3 py-1.5 rounded bg-ink text-paper font-mono text-xs font-semibold cursor-pointer transition-colors'
+                    : 'filter-btn px-3 py-1.5 rounded bg-paper border border-rule text-inkMuted hover:text-ink font-mono text-xs cursor-pointer transition-colors';
+            });
+            renderStories(filter);
+        }
+
+        // Lightbox & Field Dossier Modal
+        function openCaseModal(storyId) {
+            const story = storiesData[storyId];
+            if (!story) return;
+
+            document.getElementById('modal-category').textContent = story.categoryLabel;
+            document.getElementById('modal-meta').textContent = `${story.outlet} • ${story.cameraMeta}`;
+            document.getElementById('modal-title').textContent = story.title;
+            document.getElementById('modal-caption').textContent = story.caption;
+            document.getElementById('modal-body').innerHTML = story.body.map(p => `<p>${p}</p>`).join('');
+
+            const galleryEl = document.getElementById('modal-gallery');
+            if (story.plates && story.plates.length > 0) {
+                galleryEl.innerHTML = story.plates.map((pl, idx) => `
+                    <figure class="rounded-lg overflow-hidden border border-ink bg-darkroom">
+                        <img src="${getPlateSrc(story.id, idx, pl.key, story.title, pl.label, pl.src)}" onerror="this.onerror=null; this.src=generateDocumentaryPlate('${pl.key}', '${story.title}', '${pl.label}');" alt="${pl.label}" class="w-full max-h-[58vh] object-contain mx-auto">
+                        <figcaption class="px-4 py-2 bg-darkroomCard text-white/80 font-mono text-xs border-t border-white/10">
+                            ${pl.label}
+                        </figcaption>
+                    </figure>
+                `).join('');
+            } else {
+                galleryEl.innerHTML = '';
+            }
+
+            document.getElementById('modal-highlights').innerHTML = story.highlights.map(h => `
+                <div>
+                    <div class="font-mono text-[10px] uppercase text-inkLight">${h.label}</div>
+                    <div class="font-mono text-xs font-semibold text-ink">${h.value}</div>
+                </div>
+            `).join('');
+
+            const modal = document.getElementById('case-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeCaseModal(e) {
+            if (e && e.target !== e.currentTarget) return;
+            const modal = document.getElementById('case-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        // VERITAS v1.0 Protocol Reader Modal
+        const veritasTabs = {
+            workflow: `
+                <div class="space-y-4">
+                    <div class="p-4 rounded-lg bg-accentLight border border-accent/30">
+                        <div class="font-mono text-xs font-bold text-accent uppercase mb-1">Core Principle</div>
+                        <p class="font-serif italic text-base text-ink">
+                            “The goal of verification is reducing harm through structured, transparent management of uncertainty. Journalists who publish with honest, specific caveats serve their readers well.”
+                        </p>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 font-mono text-xs">
+                        <div class="p-3.5 rounded border border-rule bg-paperAlt">
+                            <div class="font-bold text-ink mb-1">STAGE 0: Pre-Engagement Safety Triage</div>
+                            <p class="text-inkMuted">Assess physical/legal risk and community harm before engaging. Mandatory stop on violence against identifiable persons, sexual imagery, or child exploitation.</p>
+                        </div>
+                        <div class="p-3.5 rounded border border-rule bg-paperAlt">
+                            <div class="font-bold text-ink mb-1">STAGE 1: Provenance (10–20 min)</div>
+                            <p class="text-inkMuted">Reverse image/video search (Google, Yandex, TinEye), check existing fact-checks (BOOM, MCA-DAU, Dubawa, Fact Crescendo), trace earliest upload, or use 3-frame 2G screenshots.</p>
+                        </div>
+                        <div class="p-3.5 rounded border border-rule bg-paperAlt">
+                            <div class="font-bold text-ink mb-1">STAGE 2: Technical Analysis (15–40 min)</div>
+                            <p class="text-inkMuted">FotoForensics ELA + AI or Not / Hive (images); InVID/WeVerify + TrueMedia (video); Audacity spectrogram + authentic voice comparison (audio). Document every tool run.</p>
+                        </div>
+                        <div class="p-3.5 rounded border border-rule bg-paperAlt">
+                            <div class="font-bold text-ink mb-1">STAGE 3: Human Verification (20–60 min)</div>
+                            <p class="text-inkMuted">Geolocation (Google Earth/Mapillary), Chronolocation (SunCalc shadows), 2+ independent sources, official/specialist response, and regional peer tiplines.</p>
+                        </div>
+                        <div class="p-3.5 rounded border border-rule bg-paperAlt">
+                            <div class="font-bold text-ink mb-1">STAGE 4: Confidence Assessment (5–10 min)</div>
+                            <p class="text-inkMuted">Classify explicitly: Unverified (Hold/Meta-report) • Partially Verified • Verified with Caveats • Fully Verified.</p>
+                        </div>
+                        <div class="p-3.5 rounded border border-rule bg-paperAlt">
+                            <div class="font-bold text-ink mb-1">STAGE 5: Responsible Publication &amp; DART Framing</div>
+                            <p class="text-inkMuted">Apply DART (Deny minimally, Affirm truth first, Replace with verified facts, Tell verification steps). Include methodology note &amp; labelled stills instead of re-embedding deepfakes.</p>
+                        </div>
+                    </div>
+                    <div class="p-4 rounded-lg border border-ink bg-paperAlt font-mono text-xs">
+                        <div class="font-bold text-ink uppercase mb-1">RAPID Protocol (Breaking Crisis Mode: Under 60 Minutes)</div>
+                        <p class="text-inkMuted"><strong>0–10 min:</strong> 3-frame reverse search + harm triage → <strong>10–30 min:</strong> 1 direct witness + 1 AI indicator + peer check → <strong>30–60 min:</strong> Official response + methodology disclosure or Meta-Report on circulating claim.</p>
+                    </div>
+                </div>
+            `,
+            aitext: `
+                <div class="space-y-4">
+                    <p class="text-inkMuted">
+                        Because AI-generated text lacks visual or acoustic artefacts, VERITAS pairs an <strong>8-Signal Manual Linguistic Checklist</strong> with multi-tool perplexity/burstiness verification (GPTZero, Copyleaks, ZeroGPT, Originality.AI, Winston AI).
+                    </p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 font-mono text-xs">
+                        <div class="p-3 rounded border border-rule bg-paperAlt"><strong>1. Transition Word Overuse:</strong> Dense English connectives ("In addition", "It bears mentioning") absent in authentic local speech.</div>
+                        <div class="p-3 rounded border border-rule bg-paperAlt"><strong>2. Uniform Sentence Rhythm:</strong> Sentences locked in a smooth 15–25 word cadence without natural conversational burstiness.</div>
+                        <div class="p-3 rounded border border-rule bg-paperAlt"><strong>3. Absent Local Voice:</strong> Generic international English lacking regional idioms, untranslated terms, or place specificity.</div>
+                        <div class="p-3 rounded border border-rule bg-paperAlt"><strong>4. Vague Attribution:</strong> "Experts say" or "sources indicate" with zero traceable institutions or datelines.</div>
+                        <div class="p-3 rounded border border-rule bg-paperAlt"><strong>5. Flawless Grammar in Wrong Context:</strong> Polished punctuation inside a claimed rushed WhatsApp note or spoken quote.</div>
+                        <div class="p-3 rounded border border-rule bg-paperAlt"><strong>6. Fabricated Specificity:</strong> Plausible-sounding percentages or exact dates that trace to no official dataset.</div>
+                        <div class="p-3 rounded border border-rule bg-paperAlt"><strong>7. Tonal Inconsistency:</strong> Abrupt shifts between neutral policy prose and inflammatory outrage rhetoric.</div>
+                        <div class="p-3 rounded border border-rule bg-paperAlt"><strong>8. Overly Balanced Partisan Phrasing:</strong> Oddly hedged, summary-style neutrality inside a purportedly partisan political message.</div>
+                    </div>
+                    <div class="p-3.5 rounded bg-accentLight border border-accent/30 font-mono text-xs text-ink">
+                        <strong>Critical Rule:</strong> A "Confirmed AI" determination (5+ manual signals AND &gt;80% on 2+ tools) requires independent fact-checking of every embedded claim before publication.
+                    </div>
+                </div>
+            `,
+            toolkit: `
+                <div class="space-y-4 font-mono text-xs">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <div class="p-3.5 rounded border border-rule bg-paperAlt">
+                            <div class="font-bold text-accent uppercase mb-1">Tier 1: 2G / Low Bandwidth</div>
+                            <p class="text-inkMuted">Google Reverse Image, Yandex Images, TinEye, Google Lens mobile screenshots, Google Fact Check Explorer, SunCalc chronolocation.</p>
+                        </div>
+                        <div class="p-3.5 rounded border border-rule bg-paperAlt">
+                            <div class="font-bold text-ink uppercase mb-1">Tier 2: 3G/4G Mobile &amp; Desk</div>
+                            <p class="text-inkMuted">InVID/WeVerify plugin, FotoForensics ELA, TrueMedia, Hive Moderation, Audacity spectrograms, Google Earth / Mapillary, Tattle Civic Tech.</p>
+                        </div>
+                        <div class="p-3.5 rounded border border-rule bg-paperAlt">
+                            <div class="font-bold text-ink uppercase mb-1">Tier 3: IndiaAI Mission &amp; Forensic</div>
+                            <p class="text-inkMuted">Saakshya (IIT Jodhpur/Madras) &amp; AI Vishleshak (IIT Mandi / HP Forensic Sciences) for adversarial audio-visual deepfakes.</p>
+                        </div>
+                    </div>
+                    <div class="p-4 rounded-lg border border-rule bg-paper space-y-2">
+                        <div class="font-bold text-ink uppercase">India Regional Playbook Highlights</div>
+                        <p class="text-inkMuted">• <strong>Cheapfakes vs. Deepfakes:</strong> MCA Deepfakes Analysis Unit (4,000+ clips reviewed; 130+ escalated) confirmed out-of-context and simple edits outnumber generative AI during Indian elections.</p>
+                        <p class="text-inkMuted">• <strong>Language Bias Mitigation:</strong> English-only detectors misclassify South Indian regional-language deepfakes; cross-check via MCA-DAU, BOOM Live, Alt News, WebQoof, and Shakti Collective (50+ newsrooms).</p>
+                        <p class="text-inkMuted">• <strong>Primary Records:</strong> Election Commission of India (eci.gov.in), ICMR (icmr.gov.in), and eCourts India.</p>
+                    </div>
+                </div>
+            `,
+            checklist: `
+                <div class="space-y-4">
+                    <div id="veritas-checklist-text" class="p-4 rounded-lg border border-ink bg-paperAlt font-mono text-xs space-y-2.5">
+                        <div class="font-bold text-ink uppercase border-b border-rule pb-2">
+                            VERITAS v1.0 ONE-PAGE NEWSROOM VERIFICATION CHECKLIST (2026)
+                        </div>
+                        <div><strong>STAGE 0 (SAFETY):</strong> Assess physical/legal/communal harm before engaging. Stop &amp; escalate violent/minor/non-consensual imagery.</div>
+                        <div><strong>STAGE 1 (PROVENANCE):</strong> Reverse-search 3 keyframes (Google, Yandex, TinEye) • Check BOOM / MCA-DAU / Dubawa / Fact Crescendo • Trace earliest upload.</div>
+                        <div><strong>STAGE 2 (TECHNICAL):</strong> Images: FotoForensics ELA + AI or Not/Hive • Video: InVID + TrueMedia • Audio: Audacity spectrogram + 3 authentic samples • Log tool name, date &amp; score.</div>
+                        <div><strong>STAGE 3 (HUMAN):</strong> Geolocate (Google Earth/Mapillary) • Chronolocate (SunCalc shadows) • Contact 2+ independent sources &amp; official press office.</div>
+                        <div><strong>STAGE 4–5 (DECISION &amp; DART):</strong> Verified → Publish with method note | Partial → Publish with explicit uncertainty | Unverified/High Harm → Hold or Meta-Report • Apply DART framing.</div>
+                        <div class="pt-2 border-t border-rule text-inkMuted">
+                            <strong>Co-Authors (Team 1 Capstone):</strong> Kamran Akhtar, Bilkisu Shuaibu, Dr. Emeka Offor, Sandun Arosha Fernando
+                        </div>
+                    </div>
+                    <div class="flex flex-wrap gap-2.5 font-mono text-xs">
+                        <button onclick="copyVeritasChecklist()" class="px-4 py-2 rounded bg-ink text-paper hover:bg-accent font-semibold cursor-pointer">
+                            Copy One-Page Checklist
+                        </button>
+                        <button onclick="window.print()" class="px-4 py-2 rounded border border-ink bg-paper hover:bg-paperAlt text-ink font-semibold cursor-pointer">
+                            Print Reference Sheet
+                        </button>
+                    </div>
+                </div>
+            `
+        };
+
+        function openVeritasModal() {
+            switchVeritasTab('workflow');
+            const modal = document.getElementById('veritas-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeVeritasModal(e) {
+            if (e && e.target !== e.currentTarget) return;
+            const modal = document.getElementById('veritas-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function switchVeritasTab(tabKey) {
+            document.querySelectorAll('.vtab-btn').forEach(btn => {
+                const active = btn.dataset.vtab === tabKey;
+                btn.className = active
+                    ? 'vtab-btn px-3 py-1.5 rounded bg-ink text-paper font-semibold cursor-pointer'
+                    : 'vtab-btn px-3 py-1.5 rounded bg-paper border border-rule text-inkMuted hover:text-ink cursor-pointer';
+            });
+            document.getElementById('veritas-tab-content').innerHTML = veritasTabs[tabKey] || '';
+        }
+
+        function copyVeritasChecklist() {
+            const el = document.getElementById('veritas-checklist-text');
+            if (el) copyToClipboard(el.innerText, 'VERITAS v1.0 checklist copied');
+        }
+
+        // Pitch Drawer Controls
+        function openPitchDrawer() {
+            const drawer = document.getElementById('pitch-drawer');
+            drawer.classList.remove('hidden');
+            drawer.classList.add('flex');
+        }
+
+        function closePitchDrawer(e) {
+            if (e && e.target !== e.currentTarget) return;
+            const drawer = document.getElementById('pitch-drawer');
+            drawer.classList.add('hidden');
+            drawer.classList.remove('flex');
+        }
+
+        // Print / Save PDF Helper
+        function triggerFinalPrint() {
+            filterStories('all');
+            setTimeout(() => window.print(), 120);
+        }
+
+        // Clipboard Helper
+        function copyToClipboard(text, message) {
+            const temp = document.createElement('textarea');
+            temp.value = text;
+            temp.setAttribute('readonly', '');
+            temp.style.position = 'absolute';
+            temp.style.left = '-9999px';
+            document.body.appendChild(temp);
+            temp.select();
+            try {
+                document.execCommand('copy');
+                showToast(message || 'Copied');
+            } catch (err) {
+                showToast('Unable to copy');
+            }
+            document.body.removeChild(temp);
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            const label = document.getElementById('toast-text');
+            if (!toast || !label) return;
+            label.textContent = msg;
+            toast.classList.remove('hidden');
+            toast.classList.add('flex');
+            clearTimeout(window.__toastTimer);
+            window.__toastTimer = setTimeout(() => {
+                toast.classList.add('hidden');
+                toast.classList.remove('flex');
+            }, 2500);
+        }
+
+        // ESC key closes open modals
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeCaseModal();
+                closeVeritasModal();
+                closePitchDrawer();
+            }
+        });
+
+        // Ensure clean top landing viewport on initial load
+        if (window.location.hash) {
+            history.replaceState(null, '', window.location.pathname + window.location.search);
+        }
+        window.scrollTo(0, 0);
+        closeCaseModal();
+        closeVeritasModal();
+        closePitchDrawer();
+
+        // Boot
+        hydrateLeadImage();
+        renderStories('all');
+
+        // Auto-advance animated two-frame sequence in Delhi After Dark
+        setInterval(() => {
+            const st = sequenceState['delhi-after-dark'];
+            if (st && st.playing) {
+                st.activeIdx = st.activeIdx === 0 ? 1 : 0;
+                updateSequenceDOM('delhi-after-dark');
+            }
+        }, 4200);
+    </script>
+</body>
+</html>
