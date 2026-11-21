@@ -18,14 +18,14 @@
                         mono: ['JetBrains Mono', 'monospace'],
                     },
                     colors: {
-                        paper: '#FAF8F3',
-                        paperAlt: '#F2EFE7',
-                        ink: '#141413',
-                        inkMuted: '#4A4945',
-                        inkLight: '#73716A',
-                        rule: '#DCD6C8',
-                        accent: '#9E2A2B',
-                        accentLight: '#F7ECEA',
+                        paper: 'var(--bg-paper)',
+                        paperAlt: 'var(--bg-paper-alt)',
+                        ink: 'var(--text-ink)',
+                        inkMuted: 'var(--text-ink-muted)',
+                        inkLight: 'var(--text-ink-light)',
+                        rule: 'var(--border-rule)',
+                        accent: 'var(--color-accent)',
+                        accentLight: 'var(--color-accent-light)',
                         darkroom: '#0F0F0E',
                         darkroomCard: '#171715',
                     }
@@ -34,15 +34,68 @@
         }
     </script>
     <style>
-        body {
-            background-color: #FAF8F3;
-            color: #141413;
-            font-feature-settings: "kern" 1, "liga" 1;
+        :root, [data-theme="newsprint"] {
+            --bg-paper: #FAF8F3;
+            --bg-paper-alt: #F2EFE7;
+            --text-ink: #141413;
+            --text-ink-muted: #4A4945;
+            --text-ink-light: #73716A;
+            --border-rule: #DCD6C8;
+            --color-accent: #9E2A2B;
+            --color-accent-light: #F7ECEA;
+            --wip-bg: #FEF3C7;
+            --wip-text: #78350F;
+            --wip-border: #FCD34D;
         }
-        .double-rule {
-            border-top: 2px solid #141413;
-            border-bottom: 1px solid #141413;
-            height: 5px;
+        [data-theme="sepia"] {
+            --bg-paper: #F4ECD8;
+            --bg-paper-alt: #E9DEC4;
+            --text-ink: #241C14;
+            --text-ink-muted: #524334;
+            --text-ink-light: #7A6855;
+            --border-rule: #D3C3A3;
+            --color-accent: #8C3B19;
+            --color-accent-light: #EFE0D1;
+            --wip-bg: #EDE0C4;
+            --wip-text: #5C3414;
+            --wip-border: #C4A97D;
+        }
+        [data-theme="darkroom"] {
+            --bg-paper: #121211;
+            --bg-paper-alt: #1B1B19;
+            --text-ink: #F2EFE9;
+            --text-ink-muted: #B8B3A8;
+            --text-ink-light: #8A857C;
+            --border-rule: #2E2D2A;
+            --color-accent: #E05A47;
+            --color-accent-light: #2A1917;
+            --wip-bg: #2B2110;
+            --wip-text: #FCD34D;
+            --wip-border: #6B4E16;
+        }
+        [data-theme="slate"] {
+            --bg-paper: #F3F6F9;
+            --bg-paper-alt: #E6ECF2;
+            --text-ink: #101A24;
+            --text-ink-muted: #3F5163;
+            --text-ink-light: #687B8E;
+            --border-rule: #CBD5E1;
+            --color-accent: #1D4ED8;
+            --color-accent-light: #E0E7FF;
+            --wip-bg: #DBEAFE;
+            --wip-text: #1E3A8A;
+            --wip-border: #93C5FD;
+        }
+        body {
+            background-color: var(--bg-paper);
+            color: var(--text-ink);
+            font-feature-settings: "kern" 1, "liga" 1;
+            transition: background-color 0.25s ease, color 0.25s ease;
+        }
+        .wip-badge {
+            background-color: var(--wip-bg);
+            color: var(--wip-text);
+            border: 1px solid var(--wip-border);
         }
         /* Darkroom Film Frame Styling */
         .photo-frame {
@@ -103,16 +156,16 @@
             animation-play-state: paused;
             filter: contrast(1.08);
         }
-        /* Custom scrollbar */
+        /* Theme-aware scrollbar */
         ::-webkit-scrollbar {
             width: 7px;
             height: 7px;
         }
         ::-webkit-scrollbar-track {
-            background: #F2EFE7;
+            background: var(--bg-paper-alt);
         }
         ::-webkit-scrollbar-thumb {
-            background: #C5BEB0;
+            background: var(--border-rule);
             border-radius: 4px;
         }
         /* Print & PDF Export Mode */
@@ -210,8 +263,8 @@
                         <span class="px-2 py-0.5 rounded bg-ink text-paper font-mono text-[10px] uppercase tracking-widest font-semibold">
                             Digital Portfolio
                         </span>
-                        <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-amber-100 text-amber-950 border border-amber-300 font-mono text-[10px] font-semibold">
-                            <span class="w-1.5 h-1.5 rounded-full bg-amber-600 animate-pulse"></span>
+                        <span class="wip-badge inline-flex items-center gap-1.5 px-2 py-0.5 rounded font-mono text-[10px] font-semibold">
+                            <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
                             WIP // LIVE
                         </span>
                     </div>
@@ -224,6 +277,24 @@
                     <p class="font-serif italic text-sm text-inkMuted leading-relaxed">
                         “Reporting from the fault lines of power, infrastructure, technology, labour, ecology, and public life.”
                     </p>
+                    <!-- Interactive Color Palette Switcher -->
+                    <div class="pt-2">
+                        <div class="font-mono text-[10px] uppercase tracking-widest text-inkLight mb-1.5">Edition Color Palette</div>
+                        <div class="grid grid-cols-4 gap-1.5 font-mono text-[10px]">
+                            <button type="button" onclick="setTheme('newsprint')" data-theme-btn="newsprint" class="theme-btn px-2 py-1 rounded border border-ink bg-ink text-paper font-semibold cursor-pointer flex items-center justify-center gap-1" title="Classic Broadsheet Newsprint">
+                                <span class="w-2 h-2 rounded-full bg-[#FAF8F3] border border-black/30"></span>Paper
+                            </button>
+                            <button type="button" onclick="setTheme('sepia')" data-theme-btn="sepia" class="theme-btn px-2 py-1 rounded border border-rule bg-paper text-inkMuted hover:text-ink cursor-pointer flex items-center justify-center gap-1" title="Archival Sepia">
+                                <span class="w-2 h-2 rounded-full bg-[#E9DEC4] border border-black/30"></span>Sepia
+                            </button>
+                            <button type="button" onclick="setTheme('darkroom')" data-theme-btn="darkroom" class="theme-btn px-2 py-1 rounded border border-rule bg-paper text-inkMuted hover:text-ink cursor-pointer flex items-center justify-center gap-1" title="Darkroom Night Edition">
+                                <span class="w-2 h-2 rounded-full bg-[#121211] border border-white/40"></span>Night
+                            </button>
+                            <button type="button" onclick="setTheme('slate')" data-theme-btn="slate" class="theme-btn px-2 py-1 rounded border border-rule bg-paper text-inkMuted hover:text-ink cursor-pointer flex items-center justify-center gap-1" title="Telex Wire Slate">
+                                <span class="w-2 h-2 rounded-full bg-[#1D4ED8]"></span>Slate
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Story Index Navigation -->
@@ -281,7 +352,7 @@
                     </a>
                     <a href="#build-log" class="flex items-center justify-between px-2.5 py-1.5 rounded hover:bg-paper text-xs font-mono text-inkMuted hover:text-ink transition-colors">
                         <span>Engineering &amp; Build Log</span>
-                        <span class="text-[10px] text-amber-700">WIP</span>
+                        <span class="text-[10px] text-accent">WIP</span>
                     </a>
                 </nav>
             </div>
@@ -341,8 +412,8 @@
                             </a>
                         </div>
                         <div class="flex items-center gap-3">
-                            <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-amber-100 text-amber-950 border border-amber-300 font-semibold text-[10px]">
-                                <span class="w-1.5 h-1.5 rounded-full bg-amber-600 animate-pulse"></span>
+                            <span class="wip-badge inline-flex items-center gap-1.5 px-2 py-0.5 rounded font-semibold text-[10px]">
+                                <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
                                 WIP // LIVING EDITION
                             </span>
                             <a href="https://publicnewsx.com/author/kamranakhtar/" target="_blank" rel="noopener noreferrer" class="text-ink font-semibold hover:text-accent underline decoration-rule underline-offset-2">
@@ -361,6 +432,12 @@
                             </h2>
                         </div>
                         <div class="no-print flex flex-wrap items-center gap-2 font-mono text-[11px]">
+                            <div class="lg:hidden flex items-center gap-1 bg-paperAlt border border-rule rounded p-0.5">
+                                <button type="button" onclick="setTheme('newsprint')" data-theme-btn="newsprint" class="theme-btn px-2 py-0.5 rounded bg-ink text-paper font-semibold cursor-pointer">Paper</button>
+                                <button type="button" onclick="setTheme('sepia')" data-theme-btn="sepia" class="theme-btn px-2 py-0.5 rounded text-inkMuted cursor-pointer">Sepia</button>
+                                <button type="button" onclick="setTheme('darkroom')" data-theme-btn="darkroom" class="theme-btn px-2 py-0.5 rounded text-inkMuted cursor-pointer">Night</button>
+                                <button type="button" onclick="setTheme('slate')" data-theme-btn="slate" class="theme-btn px-2 py-0.5 rounded text-inkMuted cursor-pointer">Slate</button>
+                            </div>
                             <button type="button" onclick="document.getElementById('batch-photo-input').click()" class="px-3 py-1 rounded bg-ink hover:bg-accent text-paper font-semibold transition-colors cursor-pointer">
                                 + Load Your 3 Photos in Preview
                             </button>
@@ -375,7 +452,7 @@
                 </div>
 
                 <!-- IMMERSIVE DARKROOM LEAD SHOWCASE (Above-the-Fold Split Stage) -->
-                <div class="rounded-xl bg-darkroom text-paper border border-ink overflow-hidden shadow-xl mb-6 print-break-inside">
+                <div class="rounded-xl bg-darkroom text-[#FAF8F3] border border-rule overflow-hidden shadow-xl mb-6 print-break-inside">
                     <!-- Top Darkroom Telemetry Bar -->
                     <div class="px-4 sm:px-5 py-2.5 bg-darkroomCard border-b border-white/10 flex flex-wrap items-center justify-between gap-2 font-mono text-[10px] sm:text-[11px]">
                         <div class="flex items-center gap-2">
@@ -424,7 +501,7 @@
                                 </div>
 
                                 <div class="no-print flex items-center justify-between gap-2 font-mono text-[11px]">
-                                    <button type="button" onclick="openCaseModal('invisible-avenue')" class="px-3 py-1.5 rounded bg-accent hover:bg-red-800 text-white font-semibold transition-colors cursor-pointer">
+                                    <button type="button" onclick="openCaseModal('invisible-avenue')" class="px-3 py-1.5 rounded bg-accent hover:opacity-90 text-white font-semibold transition-opacity cursor-pointer">
                                         Open Lead Field Notes →
                                     </button>
                                     <a href="#visual-archive" class="text-white/75 hover:text-white underline">
@@ -472,7 +549,7 @@
 
             <!-- 3. DEDICATED SECTION: HOSTED PHOTOGRAPHIC EDITION (#archive-layer) -->
             <section id="archive-layer" class="mb-16 scroll-mt-24 print-break-inside">
-                <div class="rounded-xl bg-darkroom text-paper border border-ink overflow-hidden shadow-lg">
+                <div class="rounded-xl bg-darkroom text-[#FAF8F3] border border-rule overflow-hidden shadow-lg">
                     <div class="px-5 sm:px-7 py-4 bg-darkroomCard border-b border-white/10 flex flex-wrap items-center justify-between gap-3">
                         <div>
                             <span class="font-mono text-[11px] uppercase tracking-widest text-red-400 font-semibold">
@@ -482,7 +559,7 @@
                                 Hosted Photographic Edition — Visual Archive Layer
                             </h2>
                         </div>
-                        <a href="https://journalistkamran.github.io/portfolio/" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-accent hover:bg-red-800 text-white font-mono text-xs font-semibold transition-colors">
+                        <a href="https://journalistkamran.github.io/portfolio/" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-accent hover:opacity-90 text-white font-mono text-xs font-semibold transition-opacity">
                             <span>Launch Live Hosted Photo Edition</span>
                             <span>↗</span>
                         </a>
@@ -530,7 +607,7 @@
                                 </a>
                             </div>
                             <div class="pt-1 flex flex-wrap gap-2.5">
-                                <a href="https://journalistkamran.github.io/portfolio/" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-4 py-2 rounded bg-white text-ink hover:bg-paperAlt font-mono text-xs font-semibold transition-colors">
+                                <a href="https://journalistkamran.github.io/portfolio/" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-4 py-2 rounded bg-white text-[#141413] hover:bg-neutral-200 font-mono text-xs font-semibold transition-colors">
                                     <span>Open Full Visual Layer</span>
                                     <span>↗</span>
                                 </a>
@@ -748,8 +825,8 @@
                             </span>
                             <span class="text-inkMuted">MAINTAINED BY <strong class="text-ink">@kamran_reports</strong></span>
                         </div>
-                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-amber-100 text-amber-950 border border-amber-300 font-semibold text-[11px]">
-                            <span class="w-2 h-2 rounded-full bg-amber-600 animate-pulse"></span>
+                        <span class="wip-badge inline-flex items-center gap-1.5 px-2.5 py-1 rounded font-semibold text-[11px]">
+                            <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
                             STATUS: WORK IN PROGRESS // LIVING ARCHIVE
                         </span>
                     </div>
@@ -894,7 +971,7 @@
     </div>
 
     <!-- TOAST NOTIFICATION -->
-    <div id="toast" class="no-print fixed bottom-5 right-5 z-50 hidden items-center gap-2 px-4 py-2.5 rounded-lg bg-ink text-paper font-mono text-xs shadow-xl border border-white/15">
+    <div id="toast" class="no-print fixed bottom-5 right-5 z-50 hidden items-center gap-2 px-4 py-2.5 rounded-lg bg-ink text-paper font-mono text-xs shadow-xl border border-rule">
         <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
         <span id="toast-text">Copied</span>
     </div>
@@ -1002,8 +1079,8 @@
                     'Reported on the ground in Meenapur, Bihar, this two-frame visual spread pairs environmental portraiture with infrastructure documentation to examine how rural households navigate recurring flood-plain disruption and uneven welfare delivery.'
                 ],
                 plates: [
-                    { key: 'meenapur-1', label: 'Frame I — Rural settlement & flood-plain embankment, Meenapur' },
-                    { key: 'meenapur-2', label: 'Frame II — Household economy & agrarian labour, Meenapur' }
+                    { key: 'meenapur-1', src: 'meenapur-1.jpg', label: 'Frame I — Rural settlement & flood-plain embankment, Meenapur' },
+                    { key: 'meenapur-2', src: 'meenapur-2.jpg', label: 'Frame II — Household economy & agrarian labour, Meenapur' }
                 ],
                 highlights: [
                     { label: 'Region', value: 'Meenapur, Bihar' },
@@ -1025,8 +1102,8 @@
                     'Photographed in Mattancherry, Fort Kochi, this two-frame study looks past postcard heritage tropes to document the shopkeepers, craft restorers, and aging masonry that sustain Jew Street’s layered cultural history.'
                 ],
                 plates: [
-                    { key: 'jew-street-1', label: 'Frame I — Historic spice & antique storefronts, Jew Street' },
-                    { key: 'jew-street-2', label: 'Frame II — Courtyard masonry & afternoon light, Mattancherry' }
+                    { key: 'jew-street-1', src: 'jew-street-1.jpg', label: 'Frame I — Historic spice & antique storefronts, Jew Street' },
+                    { key: 'jew-street-2', src: 'jew-street-2.jpg', label: 'Frame II — Courtyard masonry & afternoon light, Mattancherry' }
                 ],
                 highlights: [
                     { label: 'Location', value: 'Fort Kochi, Kerala' },
@@ -1073,7 +1150,7 @@
                     'Despite statutory prohibitions and judicial directives mandating mechanized cleaning, sanitation workers continue to enter live sewer lines without respiratory protection or safety harnesses. This visual record documents the human cost of municipal subcontracting.'
                 ],
                 plates: [
-                    { key: 'manual-sewage', label: 'Subterranean municipal drain maintenance without PPE' }
+                    { key: 'manual-sewage', src: 'manual-sewage.jpg', label: 'Subterranean municipal drain maintenance without PPE' }
                 ],
                 highlights: [
                     { label: 'Theme', value: 'Labour & Human Rights' },
@@ -1095,7 +1172,7 @@
                     'Escalating hostilities across West Asian maritime corridors directly threaten South Asia’s hydrocarbon import lifelines. This dispatch traces the transmission chain from tanker insurance spikes to domestic LPG depots and small-business fuel costs.'
                 ],
                 plates: [
-                    { key: 'energy-crisis', label: 'Domestic LPG distribution & supply-chain bottleneck' }
+                    { key: 'energy-crisis', src: 'energy-crisis.jpg', label: 'Domestic LPG distribution & supply-chain bottleneck' }
                 ],
                 highlights: [
                     { label: 'Scope', value: 'West Asia → India Supply' },
@@ -1117,8 +1194,8 @@
                     'Across the Kashmir Valley, erratic winter precipitation, receding glaciers, and rapid construction along flood-absorption wetlands are reshaping both mountain ecology and downstream horticulture.'
                 ],
                 plates: [
-                    { key: 'kashmir-1', label: 'Frame I — Alpine watershed & high-altitude valley, Kashmir' },
-                    { key: 'kashmir-2', label: 'Frame II — Wetland buffer & seasonal water stress, Kashmir' }
+                    { key: 'kashmir-1', src: 'kashmir-1.jpg', label: 'Frame I — Alpine watershed & high-altitude valley, Kashmir' },
+                    { key: 'kashmir-2', src: 'kashmir-2.jpg', label: 'Frame II — Wetland buffer & seasonal water stress, Kashmir' }
                 ],
                 highlights: [
                     { label: 'Region', value: 'Kashmir Valley' },
@@ -1140,7 +1217,7 @@
                     'Filmed on location during pre-dawn tapping shifts, this documentary follows smallholder rubber cultivators navigating volatile global commodity prices, unseasonal rainfall that disrupts tapping days, and rising input costs.'
                 ],
                 plates: [
-                    { key: 'rubber-farmers', label: 'Pre-dawn latex tapping in smallholder rubber plantation' }
+                    { key: 'rubber-farmers', src: 'rubber-farmers.jpg', label: 'Pre-dawn latex tapping in smallholder rubber plantation' }
                 ],
                 highlights: [
                     { label: 'Role', value: 'Director & Producer' },
@@ -1273,13 +1350,23 @@
                 'jew-street-1': 'Jew Street, Fort Kochi',
                 'kashmir-1': 'Kashmir Ecology: Fragile Watersheds'
             };
+            const fileMap = {
+                'invisible-avenue': 'edited-image.jpg',
+                'meenapur-1': 'meenapur-1.jpg',
+                'jew-street-1': 'jew-street-1.jpg',
+                'kashmir-1': 'kashmir-1.jpg'
+            };
             if (previewImg) {
-                if (plateKey === 'invisible-avenue') {
-                    previewImg.dataset.fallbackStep = '0';
-                    previewImg.onerror = function() {
-                        handleImageFallback(this, 'invisible-avenue', 'Invisible on the Avenue', 'Hosted High-Resolution Visual Layer • GitHub Pages');
-                    };
-                    previewImg.src = getPlateSrc('invisible-avenue', 0, 'invisible-avenue', 'Invisible on the Avenue', 'Hosted High-Resolution Visual Layer • GitHub Pages', 'edited-image.jpg');
+                const fn = fileMap[plateKey];
+                previewImg.dataset.fallbackStep = '0';
+                previewImg.dataset.fallbacks = fn ? `images/${fn},assets/${fn}` : '';
+                previewImg.onerror = function() {
+                    handleImageFallback(this, plateKey, titles[plateKey] || 'Photographic Archive', 'Hosted High-Resolution Visual Layer • GitHub Pages');
+                };
+                if (plateKey === 'invisible-avenue' && customPhotoStore['invisible-avenue-0']) {
+                    previewImg.src = customPhotoStore['invisible-avenue-0'];
+                } else if (fn) {
+                    previewImg.src = fn;
                 } else {
                     previewImg.onerror = null;
                     previewImg.src = generateDocumentaryPlate(plateKey, titles[plateKey] || 'Photographic Archive', 'Hosted High-Resolution Visual Layer • GitHub Pages');
@@ -1341,6 +1428,7 @@
                 const kbClass = cardIndex % 2 === 0 ? 'ken-burns-card' : 'ken-burns-card-alt';
                 const isSequence = Boolean(story.animatedSequence && story.plates.length > 1);
                 const isTwoFrame = !isSequence && story.plates.length > 1;
+                const safeTitle = story.title.replace(/'/g, "\\'");
 
                 let mediaHtml = '';
                 if (isSequence) {
@@ -1349,8 +1437,8 @@
                     const src1 = getPlateSrc(story.id, 1, story.plates[1].key, story.title, story.plates[1].label, story.plates[1].src);
                     mediaHtml = `
                         <div class="photo-frame aspect-[16/10] relative group/frame">
-                            <img id="seq-img-${story.id}-0" src="${src0}" data-fallbacks="images/image_9ef244.jpg,assets/image_9ef244.jpg" onerror="handleImageFallback(this, 'delhi-after-dark', '${story.title}', 'Frame I • Kinetic')" alt="${story.plates[0].label}" class="absolute inset-0 w-full h-full object-cover ken-burns-card" style="opacity: ${st.activeIdx === 0 ? 1 : 0};">
-                            <img id="seq-img-${story.id}-1" src="${src1}" data-fallbacks="images/image_9ef528.jpg,assets/image_9ef528.jpg" onerror="handleImageFallback(this, 'delhi-after-dark', '${story.title}', 'Frame II • Stillness')" alt="${story.plates[1].label}" class="absolute inset-0 w-full h-full object-cover ken-burns-card-alt" style="opacity: ${st.activeIdx === 1 ? 1 : 0};">
+                            <img id="seq-img-${story.id}-0" src="${src0}" data-fallbacks="images/image_9ef244.jpg,assets/image_9ef244.jpg" onerror="handleImageFallback(this, 'delhi-after-dark', '${safeTitle}', 'Frame I • Kinetic')" alt="${story.plates[0].label}" class="absolute inset-0 w-full h-full object-cover ken-burns-card" style="opacity: ${st.activeIdx === 0 ? 1 : 0};">
+                            <img id="seq-img-${story.id}-1" src="${src1}" data-fallbacks="images/image_9ef528.jpg,assets/image_9ef528.jpg" onerror="handleImageFallback(this, 'delhi-after-dark', '${safeTitle}', 'Frame II • Stillness')" alt="${story.plates[1].label}" class="absolute inset-0 w-full h-full object-cover ken-burns-card-alt" style="opacity: ${st.activeIdx === 1 ? 1 : 0};">
                             <div class="no-print absolute top-2.5 left-2.5 z-10 flex items-center gap-1.5">
                                 <button type="button" id="seq-play-${story.id}" onclick="event.stopPropagation(); toggleSequencePlay('${story.id}')" class="px-2 py-0.5 rounded bg-black/80 text-emerald-300 font-mono text-[9px] font-semibold border border-white/20 cursor-pointer">
                                     ${st.playing ? '❚❚ AUTO' : '▶ PLAY'}
@@ -1373,19 +1461,25 @@
                         </div>
                     `;
                 } else if (isTwoFrame) {
-                    mediaHtml = `<div class="grid grid-cols-2 gap-0.5 bg-ink">
-                        ${story.plates.map((pl, idx) => `
+                    mediaHtml = `<div class="grid grid-cols-2 gap-0.5 bg-rule">
+                        ${story.plates.map((pl, idx) => {
+                            const fb = pl.src ? `images/${pl.src},assets/${pl.src}` : '';
+                            const safeSub = pl.label.replace(/'/g, "\\'");
+                            return `
                             <div class="photo-frame aspect-[4/3] relative group/frame">
-                                <img src="${getPlateSrc(story.id, idx, pl.key, story.title, pl.label, pl.src)}" alt="${pl.label}" class="w-full h-full object-cover ${idx === 0 ? 'ken-burns-card' : 'ken-burns-card-alt'}">
+                                <img src="${getPlateSrc(story.id, idx, pl.key, story.title, pl.label, pl.src)}" data-fallbacks="${fb}" onerror="handleImageFallback(this, '${pl.key}', '${safeTitle}', '${safeSub}')" alt="${pl.label}" class="w-full h-full object-cover ${idx === 0 ? 'ken-burns-card' : 'ken-burns-card-alt'}">
                                 <button type="button" onclick="event.stopPropagation(); triggerPhotoUpload('${story.id}', ${idx})" class="no-print absolute bottom-2 right-2 z-10 px-2 py-0.5 rounded bg-black/85 hover:bg-accent text-white font-mono text-[9px] uppercase border border-white/25 transition-colors cursor-pointer">
                                     Load #${idx + 1}
                                 </button>
                             </div>
-                        `).join('')}
+                        `}).join('')}
                        </div>`;
                 } else {
+                    const pl = story.plates[0];
+                    const fb = pl.src ? `images/${pl.src},assets/${pl.src}` : '';
+                    const safeSub = pl.label.replace(/'/g, "\\'");
                     mediaHtml = `<div class="photo-frame aspect-[16/10] relative">
-                        <img src="${getPlateSrc(story.id, 0, story.plates[0].key, story.title, story.plates[0].label, story.plates[0].src)}" alt="${story.title}" class="w-full h-full object-cover ${kbClass}">
+                        <img src="${getPlateSrc(story.id, 0, pl.key, story.title, pl.label, pl.src)}" data-fallbacks="${fb}" onerror="handleImageFallback(this, '${pl.key}', '${safeTitle}', '${safeSub}')" alt="${story.title}" class="w-full h-full object-cover ${kbClass}">
                         <button type="button" onclick="event.stopPropagation(); triggerPhotoUpload('${story.id}', 0)" class="no-print absolute bottom-2.5 right-2.5 z-10 px-2.5 py-1 rounded bg-black/85 hover:bg-accent text-white font-mono text-[10px] uppercase border border-white/25 transition-colors cursor-pointer">
                             Load Photo
                         </button>
@@ -1462,7 +1556,7 @@
             const galleryEl = document.getElementById('modal-gallery');
             if (story.plates && story.plates.length > 0) {
                 galleryEl.innerHTML = story.plates.map((pl, idx) => `
-                    <figure class="rounded-lg overflow-hidden border border-ink bg-darkroom">
+                    <figure class="rounded-lg overflow-hidden border border-rule bg-darkroom">
                         <img src="${getPlateSrc(story.id, idx, pl.key, story.title, pl.label, pl.src)}" onerror="this.onerror=null; this.src=generateDocumentaryPlate('${pl.key}', '${story.title}', '${pl.label}');" alt="${pl.label}" class="w-full max-h-[58vh] object-contain mx-auto">
                         <figcaption class="px-4 py-2 bg-darkroomCard text-white/80 font-mono text-xs border-t border-white/10">
                             ${pl.label}
@@ -1703,6 +1797,26 @@
         closeCaseModal();
         closeVeritasModal();
         closePitchDrawer();
+
+        // Edition Color Palette Switcher (persists in localStorage)
+        function setTheme(themeName) {
+            document.documentElement.setAttribute('data-theme', themeName);
+            try { localStorage.setItem('kamran_portfolio_theme', themeName); } catch (e) {}
+            document.querySelectorAll('.theme-btn').forEach(btn => {
+                const isActive = btn.dataset.themeBtn === themeName;
+                if (btn.closest('#left-rail')) {
+                    btn.className = isActive
+                        ? 'theme-btn px-2 py-1 rounded border border-ink bg-ink text-paper font-semibold cursor-pointer flex items-center justify-center gap-1'
+                        : 'theme-btn px-2 py-1 rounded border border-rule bg-paper text-inkMuted hover:text-ink cursor-pointer flex items-center justify-center gap-1';
+                } else {
+                    btn.className = isActive
+                        ? 'theme-btn px-2 py-0.5 rounded bg-ink text-paper font-semibold cursor-pointer'
+                        : 'theme-btn px-2 py-0.5 rounded text-inkMuted cursor-pointer';
+                }
+            });
+        }
+        const savedTheme = (() => { try { return localStorage.getItem('kamran_portfolio_theme'); } catch (e) { return null; } })();
+        setTheme(savedTheme || 'newsprint');
 
         // Boot
         hydrateLeadImage();
